@@ -1,0 +1,32 @@
+parameters:
+    level: max
+
+    checkMissingIterableValueType: false
+
+    ignoreErrors:
+        -
+            message: '#Negated boolean expression is always false.#'
+            count: 1
+            path: /source/src/exception/DataEntryException.php
+        -
+            message: '#Function zstd_uncompress not found.#'
+            count: 1
+            path: /source/src/data/ReplayDecompressor.php
+        -
+            message: '#Constant ZSTD_COMPRESS_LEVEL_MAX not found.#'
+            count: 1
+            path: /source/src/thread/ThreadedMemory.php
+        -
+            message: '#Function zstd_compress not found.#'
+            count: 1
+            path: /source/src/thread/ThreadedMemory.php
+
+    paths:
+        - /source/src
+    autoload_files:
+        - phar:///pocketmine/PocketMine-MP.phar/vendor/autoload.php
+    autoload_directories:
+        - /source/src
+        - /source/NGEssentials/src
+    excludes_analyse:
+        - /source/NGEssentials/src/libReplay
