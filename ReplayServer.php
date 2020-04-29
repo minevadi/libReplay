@@ -14,6 +14,8 @@ use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\plugin\PluginManager;
+use const PTHREADS_INHERIT_CONSTANTS;
+use const PTHREADS_INHERIT_INI;
 
 /**
  * Class ReplayServer
@@ -309,7 +311,7 @@ class ReplayServer
             foreach ($this->connectedClientList as $connectedClient) {
                 $this->memory->addClientData($connectedClient->convertToNonVolatile());
             }
-            $this->memory->start();
+            $this->memory->start(PTHREADS_INHERIT_INI | PTHREADS_INHERIT_CONSTANTS);
             $saveTask = new RecordingSaveTask($this->memory, $extraSaveData);
             self::$plugin->getScheduler()->scheduleRepeatingTask($saveTask, 20);
         }

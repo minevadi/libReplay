@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace libReplay\thread;
 
+use JsonException;
 use pocketmine\Thread;
+use function var_dump;
 
 /**
  * Class ThreadedMemory
@@ -26,6 +28,7 @@ class ThreadedMemory extends Thread
 
     /** @var string|null */
     private $compressedMemory;
+
 
     /**
      * Inflate the compressed memory for
@@ -63,6 +66,7 @@ class ThreadedMemory extends Thread
      *
      * @param bool $useZStandard
      * @return void
+     * @throws JsonException
      */
     public function compress(bool $useZStandard = true): void
     {
@@ -73,6 +77,7 @@ class ThreadedMemory extends Thread
             } else {
                 $compressedMemory = gzdeflate($json, 9);
             }
+
             if ($compressedMemory !== false) {
                 $this->compressedMemory = $compressedMemory;
                 return;
@@ -89,7 +94,13 @@ class ThreadedMemory extends Thread
      */
     public function run(): void
     {
-        $this->compress();
+        $this->registerClassLoader();
+
+        try {
+            $this->compress();
+        } catch (JsonException $exception){
+            var_dump($exception->getMessage());
+        }
         return;
     }
 
@@ -106,6 +117,7 @@ class ThreadedMemory extends Thread
         if ($this->isRunning()) {
             return 0x101;
         }
+
         return $this->compressedMemory;
     }
 
