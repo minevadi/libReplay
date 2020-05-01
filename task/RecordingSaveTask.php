@@ -39,7 +39,7 @@ class RecordingSaveTask extends Task
      */
     public function onRun(int $currentTick): void
     {
-        if (!$this->memory->isRunning()) {
+        if ($this->memory->pollForCompression()) {
             $result = $this->memory->getResult();
             if (is_string($result)) {
                 $replay = new ReplayCompressed($result);
@@ -49,9 +49,12 @@ class RecordingSaveTask extends Task
                 if (($handler = $this->getHandler()) !== null) {
                     $handler->cancel();
                 }
+                $this->memory->markReadyToFlush();
                 return;
             }
+            $this->memory->markReadyToFlush();
         }
+        return;
     }
 
 }

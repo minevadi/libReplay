@@ -20,6 +20,11 @@ class ThreadedMemory extends Thread
     public const MEMORY_TYPE_REPLAY = 0;
     public const MEMORY_TYPE_CLIENT = 1;
 
+    /** @var bool */
+    private $finishedCompression = false;
+    /** @var bool */
+    private $readyToFlush = false;
+
     /** @var array */
     private $memory = [
         self::MEMORY_TYPE_REPLAY => [],
@@ -28,20 +33,6 @@ class ThreadedMemory extends Thread
 
     /** @var string|null */
     private $compressedMemory;
-
-
-    /**
-     * Inflate the compressed memory for
-     * decompression purposes.
-     *
-     * @param string $compressedMemory
-     * @return void
-     */
-    public function inflateCompressedMemory(string $compressedMemory): void
-    {
-        $this->compressedMemory = $compressedMemory;
-        return;
-    }
 
     /**
      * Add the current tick to memory.
@@ -67,6 +58,7 @@ class ThreadedMemory extends Thread
      * @param bool $useZStandard
      * @return void
      * @throws JsonException
+     * @noinspection PhpDocRedundantThrowsInspection
      */
     public function compress(bool $useZStandard = true): void
     {
@@ -98,10 +90,27 @@ class ThreadedMemory extends Thread
 
         try {
             $this->compress();
+            $this->compress();
+            $this->finishedCompression = true;
+            while (!$this->readyToFlush) {
+                $this->wait(1000);
+            }
         } catch (JsonException $exception){
+            /** @noinspection ForgottenDebugOutputInspection */
             var_dump($exception->getMessage());
         }
         return;
+    }
+
+    /**
+     * Poll to check whether compression has
+     * finished yet.
+     *
+     * @return bool
+     */
+    public function pollForCompression(): bool
+    {
+        return $this->finishedCompression;
     }
 
     /**
@@ -114,11 +123,21 @@ class ThreadedMemory extends Thread
      */
     public function getResult()
     {
-        if ($this->isRunning()) {
+        if (!$this->finishedCompression) {
             return 0x101;
         }
 
         return $this->compressedMemory;
+    }
+
+    /**
+     * Mark thread ready to be flushed.
+     *
+     * @return void
+     */
+    public function markReadyToFlush(): void
+    {
+        $this->readyToFlush = true;
     }
 
 }
