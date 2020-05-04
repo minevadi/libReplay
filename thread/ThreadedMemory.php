@@ -90,7 +90,6 @@ class ThreadedMemory extends Thread
 
         try {
             $this->compress();
-            $this->compress();
             $this->finishedCompression = true;
             while (!$this->readyToFlush) {
                 $this->wait(1000);
