@@ -92,7 +92,7 @@ class ThreadedMemory extends Thread
             $this->compress();
             $this->finishedCompression = true;
             while (!$this->readyToFlush) {
-                $this->wait(1000);
+                usleep(1000000);
             }
         } catch (JsonException $exception){
             /** @noinspection ForgottenDebugOutputInspection */
