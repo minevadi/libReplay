@@ -11,15 +11,15 @@ parameters:
         -
             message: '#Function zstd_uncompress not found.#'
             count: 1
-            path: /source/src/data/ReplayDecompressor.php
+            path: /source/src/data/ReplayCompressor.php
         -
             message: '#Constant ZSTD_COMPRESS_LEVEL_MAX not found.#'
             count: 1
-            path: /source/src/thread/ThreadedMemory.php
+            path: /source/src/task/ReplayCompressionTask.php
         -
             message: '#Function zstd_compress not found.#'
             count: 1
-            path: /source/src/thread/ThreadedMemory.php
+            path: /source/src/task/ReplayCompressionTask.php
 
     paths:
         - /source/src
