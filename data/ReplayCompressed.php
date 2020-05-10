@@ -7,7 +7,7 @@ namespace libReplay\data;
 use libReplay\data\entry\DataEntry;
 use libReplay\ReplayClient;
 use libReplay\ReplayServer;
-use libReplay\thread\ThreadedMemory;
+use libReplay\task\ReplayCompressionTask;
 
 /**
  * Class ReplayCompressed
@@ -57,14 +57,14 @@ class ReplayCompressed
      */
     public function decompress(): ?Replay
     {
-        $memory = ReplayDecompressor::decompress($this->memory);
-        $validationCheck = array_key_exists(ThreadedMemory::MEMORY_TYPE_REPLAY, $memory) &&
-            array_key_exists(ThreadedMemory::MEMORY_TYPE_CLIENT, $memory);
+        $memory = ReplayCompressor::decompress($this->memory);
+        $validationCheck = array_key_exists(ReplayCompressionTask::MEMORY_TYPE_REPLAY, $memory) &&
+            array_key_exists(ReplayCompressionTask::MEMORY_TYPE_CLIENT, $memory);
         if (!is_array($memory) || !$validationCheck) {
             return null;
         }
         $dataEntryMemory = [];
-        foreach ($memory[ThreadedMemory::MEMORY_TYPE_REPLAY] as $tick => $nonVolatileDataEntryList) {
+        foreach ($memory[ReplayCompressionTask::MEMORY_TYPE_REPLAY] as $tick => $nonVolatileDataEntryList) {
             $dataEntryListPerTick = [];
             foreach ($nonVolatileDataEntryList as $stepStamp => $nonVolatileDataEntry) {
                 $dataEntry = DataEntry::readFromNonVolatile($nonVolatileDataEntry);
@@ -76,7 +76,7 @@ class ReplayCompressed
             $dataEntryMemory[$tick] = $dataEntryListPerTick;
         }
         $recordedClientList = [];
-        foreach ($memory[ThreadedMemory::MEMORY_TYPE_CLIENT] as $index => $nonVolatileClient) {
+        foreach ($memory[ReplayCompressionTask::MEMORY_TYPE_CLIENT] as $index => $nonVolatileClient) {
             $recordedClient = ReplayClient::constructFromNonVolatile($nonVolatileClient);
             if ($recordedClient === null) {
                 return null;

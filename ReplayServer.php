@@ -7,15 +7,13 @@ namespace libReplay;
 use libReplay\data\entry\DataEntry;
 use libReplay\data\ReplayListener;
 use libReplay\task\CaptureTask;
-use libReplay\task\RecordingSaveTask;
-use libReplay\thread\ThreadedMemory;
+use libReplay\task\ReplayCompressionTask;
+use NetherGames\NGEssentials\thread\NGThreadPool;
 use pocketmine\event\HandlerList;
 use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\plugin\PluginManager;
-use const PTHREADS_INHERIT_CONSTANTS;
-use const PTHREADS_INHERIT_INI;
 
 /**
  * Class ReplayServer
@@ -122,8 +120,8 @@ class ReplayServer
     /** @var bool */
     private $recording = false;
 
-    /** @var ThreadedMemory */
-    private $memory;
+    /** @var ReplayCompressionTask */
+    private $compressionTask;
 
     /**
      * ReplayServer constructor.
@@ -253,7 +251,7 @@ class ReplayServer
             $threadSafeTickMemory[$stepStamp] = $dataEntry->convertToNonVolatile();
         }
         $this->currentTickDataEntryMemory = [];
-        $this->memory->addCurrentTickToMemory($currentTick, $threadSafeTickMemory);
+        $this->compressionTask->addCurrentTickToMemory($currentTick, $threadSafeTickMemory);
         return;
     }
 
@@ -283,7 +281,7 @@ class ReplayServer
         if ($this->recording) {
             // start recording & return
             $this->currentTickDataEntryMemory = [];
-            $this->memory = new ThreadedMemory();
+            $this->compressionTask = new ReplayCompressionTask();
             $this->replayListener = new ReplayListener($this);
             self::$pluginManager->registerEvents($this->replayListener, self::$plugin);
             $this->captureTask = new CaptureTask($this);
@@ -309,11 +307,10 @@ class ReplayServer
             $this->dataEntryMemory = [];
              */
             foreach ($this->connectedClientList as $connectedClient) {
-                $this->memory->addClientData($connectedClient->convertToNonVolatile());
+                $this->compressionTask->addClientData($connectedClient->convertToNonVolatile());
             }
-            $this->memory->start(PTHREADS_INHERIT_INI | PTHREADS_INHERIT_CONSTANTS);
-            $saveTask = new RecordingSaveTask($this->memory, $extraSaveData);
-            self::$plugin->getScheduler()->scheduleRepeatingTask($saveTask, 20);
+            $this->compressionTask->storeExtraData($extraSaveData);
+            NGThreadPool::getInstance()->submitTask($this->compressionTask);
         }
         return;
     }
