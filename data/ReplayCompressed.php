@@ -57,7 +57,7 @@ class ReplayCompressed
      */
     public function decompress(): ?Replay
     {
-        $memory = ReplayCompressor::decompress($this->memory);
+        $memory = ReplayDecompressor::decompress($this->memory);
         $validationCheck = array_key_exists(ReplayCompressionTask::MEMORY_TYPE_REPLAY, $memory) &&
             array_key_exists(ReplayCompressionTask::MEMORY_TYPE_CLIENT, $memory);
         if (!is_array($memory) || !$validationCheck) {

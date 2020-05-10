@@ -6,10 +6,10 @@ namespace libReplay\task;
 
 use BadMethodCallException;
 use libReplay\data\ReplayCompressed;
-use libReplay\data\ReplayCompressor;
 use libReplay\event\ReplayComposedEvent;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
+use RuntimeException;
 
 /**
  * Class ReplayCompressionTask
@@ -72,7 +72,17 @@ class ReplayCompressionTask extends AsyncTask
      */
     public function onRun(): void
     {
-        $this->compressedMemory = ReplayCompressor::compress($this->memory);
+        $json = json_encode($this->memory, JSON_THROW_ON_ERROR, 512);
+        if ($json !== false) {
+            $compressedMemory = zstd_compress($json, ZSTD_COMPRESS_LEVEL_MAX);
+
+            if ($compressedMemory !== false) {
+                $this->compressedMemory = $compressedMemory;
+                return;
+            }
+        }
+
+        throw new RuntimeException('Compression failed');
     }
 
     /**
