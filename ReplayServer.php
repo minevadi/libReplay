@@ -311,6 +311,7 @@ class ReplayServer
             }
             $this->compressionTask->storeExtraData($extraSaveData);
             NGThreadPool::getInstance()->submitTask($this->compressionTask);
+            unset(self::$serverList[array_search($this, self::$serverList)]);
         }
         return;
     }
