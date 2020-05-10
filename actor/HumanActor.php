@@ -20,6 +20,7 @@ use libReplay\exception\DataEntryException;
 use libReplay\ReplayViewer;
 use NetherGames\NGEssentials\utils\packets\PacketManager;
 use NetherGames\NGEssentials\utils\packets\PublicQueue;
+use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Effect;
@@ -31,7 +32,10 @@ use pocketmine\event\entity\EntityRegainHealthEvent;
 use pocketmine\inventory\ArmorInventory;
 use pocketmine\inventory\PlayerInventory;
 use pocketmine\item\Item;
+use pocketmine\level\ChunkLoader;
+use pocketmine\level\format\Chunk;
 use pocketmine\level\Level;
+use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\network\mcpe\protocol\AnimatePacket;
@@ -48,7 +52,7 @@ use function round;
  * @package libReplay\actor
  * @internal
  */
-class HumanActor extends Human
+class HumanActor extends Human implements ChunkLoader
 {
 
     private const BASE_INVENTORY = 0;
@@ -70,12 +74,16 @@ class HumanActor extends Human
     private $emulatedInventoryList = [];
     /** @var PublicQueue */
     private $packetQueue;
+    /** @var int THIS 0 IS IMPORTANT*/
+    private $loaderId = 0;
 
     public function __construct(Level $level, CompoundTag $nbt, Skin $skin)
     {
         $this->setSkin($skin);
 
         parent::__construct($level, $nbt);
+
+        $this->loaderId = Level::generateChunkLoaderId($this);
     }
 
     /**
@@ -553,4 +561,38 @@ class HumanActor extends Human
      */
     public function applyDamageModifiers(EntityDamageEvent $source): void {}
 
+    public function getLoaderId(): int
+    {
+        return $this->loaderId;
+    }
+
+    public function isLoaderActive(): bool
+    {
+        return true;
+    }
+
+    public function onChunkChanged(Chunk $chunk): void
+    {
+
+    }
+
+    public function onChunkLoaded(Chunk $chunk): void
+    {
+
+    }
+
+    public function onChunkUnloaded(Chunk $chunk): void
+    {
+
+    }
+
+    public function onChunkPopulated(Chunk $chunk): void
+    {
+
+    }
+
+    public function onBlockChanged(Vector3 $block): void
+    {
+
+    }
 }
