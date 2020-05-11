@@ -23,6 +23,8 @@ class ReplayCompressionTask extends AsyncTask
     public const MEMORY_TYPE_REPLAY = 0;
     public const MEMORY_TYPE_CLIENT = 1;
 
+    private const COMPRESSION_LEVEL = 19;
+
     /** @var array */
     private $memory = [
         self::MEMORY_TYPE_REPLAY => [],
@@ -74,7 +76,7 @@ class ReplayCompressionTask extends AsyncTask
     {
         $json = json_encode($this->memory, JSON_THROW_ON_ERROR, 512);
         if ($json !== false) {
-            $compressedMemory = zstd_compress($json, ZSTD_COMPRESS_LEVEL_MAX);
+            $compressedMemory = zstd_compress($json, self::COMPRESSION_LEVEL);
 
             if ($compressedMemory !== false) {
                 $this->compressedMemory = $compressedMemory;
