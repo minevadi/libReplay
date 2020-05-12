@@ -83,7 +83,7 @@ server is just the level and a bunch of connected clients. Only the connected
 clients are recorded. This can be done very simply too:
 ```php
 $playerListToRecord = array<Player>;
-$replayServer = new \libReplay\ReplayServer($playerListToRecord, <RecordedLevelName>, <ReferenceLevelName>);
+$replayServer = new \libReplay\ReplayServer($playerListToRecord, <RecordedLevel>);
 ```
 That's all. Simple.
     
