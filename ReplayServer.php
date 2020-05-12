@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace libReplay;
 
 use libReplay\data\entry\DataEntry;
-use libReplay\data\ReplayListener;
+use libReplay\event\ReplayListener;
 use libReplay\task\CaptureTask;
 use libReplay\task\ReplayCompressionTask;
 use NetherGames\NGEssentials\thread\NGThreadPool;
@@ -43,7 +43,6 @@ class ReplayServer
         self::$plugin = $plugin;
         self::$pluginManager = $plugin->getServer()->getPluginManager();
         ReplayViewer::setup();
-        return;
     }
 
     /**
@@ -131,11 +130,7 @@ class ReplayServer
     public function __construct(array $playerList, Level $level)
     {
         foreach ($playerList as $player) {
-            $client = ReplayClient::readFromPlayer($player);
-            if (!$client instanceof ReplayClient) {
-                continue;
-            }
-            $this->connectedClientList[$client->getClientId()] = $client;
+            $this->addClientFromPlayer($player);
         }
         $this->level = $level;
         self::$serverList[] = $this;
@@ -230,7 +225,6 @@ class ReplayServer
     public function addEntryToTickMemory(DataEntry $entry): void
     {
         $this->currentTickDataEntryMemory[] = $entry;
-        return;
     }
 
     /**
@@ -252,7 +246,6 @@ class ReplayServer
         }
         $this->currentTickDataEntryMemory = [];
         $this->compressionTask->addCurrentTickToMemory($currentTick, $threadSafeTickMemory);
-        return;
     }
 
     /**
@@ -299,6 +292,7 @@ class ReplayServer
             self::$plugin->getScheduler()->cancelTask($taskId);
             unset($this->captureTask);
         }
+
         if ($saveRecording) {
             /**
             $replay = new Replay($this->dataEntryMemory, $this->connectedClientList, $this->referenceLevelName);
@@ -313,7 +307,6 @@ class ReplayServer
             NGThreadPool::getInstance()->submitTask($this->compressionTask);
             unset(self::$serverList[array_search($this, self::$serverList)]);
         }
-        return;
     }
 
 }

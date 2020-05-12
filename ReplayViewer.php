@@ -26,7 +26,6 @@ class ReplayViewer
     public static function setup(): void
     {
         Entity::registerEntity(HumanActor::class, true);
-        return;
     }
 
     /** @var Replay */
@@ -88,7 +87,6 @@ class ReplayViewer
             }
             $this->actorList[$clientId]->configure($this, $clientScript);
         }
-        return;
     }
 
     /**
@@ -105,7 +103,6 @@ class ReplayViewer
         foreach ($this->actorList as $actor) {
             $actor->spawnToAll();
         }
-        return;
     }
 
     /**
@@ -149,7 +146,6 @@ class ReplayViewer
         foreach ($this->actorList as $actor) {
             $actor->flagForDespawn();
         }
-        return;
     }
 
     /**

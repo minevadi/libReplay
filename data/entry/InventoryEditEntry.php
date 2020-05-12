@@ -27,6 +27,8 @@ class InventoryEditEntry extends DataEntry
 
     /**
      * @inheritDoc
+     *
+     * @internal
      */
     public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
     {
@@ -142,6 +144,8 @@ class InventoryEditEntry extends DataEntry
 
     /**
      * @inheritDoc
+     *
+     * @internal
      */
     public function convertToNonVolatile(): array
     {

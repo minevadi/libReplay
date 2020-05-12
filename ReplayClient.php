@@ -38,6 +38,8 @@ class ReplayClient
      *
      * @param array $nonVolatileClient
      * @return ReplayClient|null
+     *
+     * @internal
      */
     public static function constructFromNonVolatile(array $nonVolatileClient): ?ReplayClient
     {
@@ -217,7 +219,6 @@ class ReplayClient
     public function toggleRecord(): void
     {
         $this->recorded = !$this->recorded;
-        return;
     }
 
     /**
@@ -225,6 +226,8 @@ class ReplayClient
      * format.
      *
      * @return array
+     *
+     * @internal
      */
     public function convertToNonVolatile(): array
     {

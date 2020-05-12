@@ -84,6 +84,8 @@ class BlockPlaceEntry extends BlockEntry
 
     /**
      * @inheritDoc
+     *
+     * @internal
      */
     public function convertToNonVolatile(): array
     {

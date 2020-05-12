@@ -20,7 +20,6 @@ use libReplay\exception\DataEntryException;
 use libReplay\ReplayViewer;
 use NetherGames\NGEssentials\utils\packets\PacketManager;
 use NetherGames\NGEssentials\utils\packets\PublicQueue;
-use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Effect;
@@ -114,7 +113,6 @@ class HumanActor extends Human implements ChunkLoader
         $this->getInventory()->setHeldItemIndex(0);
         $this->setNameTagVisible(true);
         $this->setNameTagAlwaysVisible(true);
-        return;
     }
 
     /**
@@ -186,7 +184,6 @@ class HumanActor extends Human implements ChunkLoader
             }
         }
         $this->tryForwardToNextStep();
-        return;
     }
 
     /**
@@ -234,7 +231,6 @@ class HumanActor extends Human implements ChunkLoader
         }
         $key = array_search($entry, $this->script[$this->step], true);
         unset($this->script[$this->step][$key]);
-        return;
     }
 
     /**
@@ -301,7 +297,6 @@ class HumanActor extends Human implements ChunkLoader
 
         $key = array_search($entry, $this->script[$this->step], true);
         unset($this->script[$this->step][$key]);
-        return;
     }
 
     /**
@@ -327,7 +322,6 @@ class HumanActor extends Human implements ChunkLoader
 
         $key = array_search($entry, $this->script[$this->step], true);
         unset($this->script[$this->step][$key]);
-        return;
     }
 
     /**
@@ -353,7 +347,6 @@ class HumanActor extends Human implements ChunkLoader
 
         $key = array_search($entry, $this->script[$this->step], true);
         unset($this->script[$this->step][$key]);
-        return;
     }
 
     /**
@@ -388,7 +381,6 @@ class HumanActor extends Human implements ChunkLoader
         $this->packetQueue->addPacket($packet);
         $key = array_search($entry, $this->script[$this->step], true);
         unset($this->script[$this->step][$key]);
-        return;
     }
 
     /**
@@ -409,7 +401,6 @@ class HumanActor extends Human implements ChunkLoader
         $this->replayLevel->setBlock($position, $block);
         $key = array_search($entry, $this->script[$this->step], true);
         unset($this->script[$this->step][$key]);
-        return;
     }
 
     /**
@@ -428,7 +419,6 @@ class HumanActor extends Human implements ChunkLoader
         $this->replayLevel->setBlock($position, $block);
         $key = array_search($entry, $this->script[$this->step], true);
         unset($this->script[$this->step][$key]);
-        return;
     }
 
     /**
@@ -462,7 +452,6 @@ class HumanActor extends Human implements ChunkLoader
 
         $key = array_search($entry, $this->script[$this->step], true);
         unset($this->script[$this->step][$key]);
-        return;
     }
 
     /**
@@ -490,7 +479,6 @@ class HumanActor extends Human implements ChunkLoader
         $this->packetQueue->addPacket($packet);
         $key = array_search($entry, $this->script[$this->step], true);
         unset($this->script[$this->step][$key]);
-        return;
     }
 
     /**
@@ -531,7 +519,6 @@ class HumanActor extends Human implements ChunkLoader
         if (!$stepExistence) {
             $this->flagForDespawn();
         }
-        return;
     }
 
     /**
@@ -561,38 +548,45 @@ class HumanActor extends Human implements ChunkLoader
      */
     public function applyDamageModifiers(EntityDamageEvent $source): void {}
 
+    /**
+     * @inheritDoc
+     */
     public function getLoaderId(): int
     {
         return $this->loaderId;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function isLoaderActive(): bool
     {
         return true;
     }
 
-    public function onChunkChanged(Chunk $chunk): void
-    {
+    /**
+     * @inheritDoc
+     */
+    public function onChunkChanged(Chunk $chunk): void {}
 
-    }
+    /**
+     * @inheritDoc
+     */
+    public function onChunkLoaded(Chunk $chunk): void {}
 
-    public function onChunkLoaded(Chunk $chunk): void
-    {
+    /**
+     * @inheritDoc
+     */
+    public function onChunkUnloaded(Chunk $chunk): void {}
 
-    }
+    /**
+     * @inheritDoc
+     */
+    public function onChunkPopulated(Chunk $chunk): void {}
 
-    public function onChunkUnloaded(Chunk $chunk): void
-    {
+    /**
+     * @inheritDoc
+     */
+    public function onBlockChanged(Vector3 $block): void {}
 
-    }
-
-    public function onChunkPopulated(Chunk $chunk): void
-    {
-
-    }
-
-    public function onBlockChanged(Vector3 $block): void
-    {
-
-    }
 }

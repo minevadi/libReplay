@@ -55,7 +55,6 @@ class ReplayCompressionTask extends AsyncTask
     public function addCurrentTickToMemory(int $currentTick, array $tickMemory): void
     {
         $this->memory[self::MEMORY_TYPE_REPLAY][$currentTick] = $tickMemory;
-        return;
     }
 
     /**

@@ -11,6 +11,10 @@ use pocketmine\math\Vector3;
 /**
  * Class BlockBreakEntry
  * @package libReplay\data\entry
+ *
+ * Converting to non-volatile is handled
+ * by the parent abstract class:
+ * {@link BlockEntry}.
  */
 class BlockBreakEntry extends BlockEntry
 {

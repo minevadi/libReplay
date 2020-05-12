@@ -35,7 +35,6 @@ class CaptureTask extends Task
     public function onRun(int $currentTick): void
     {
         $this->replayServer->capture($currentTick);
-        return;
     }
 
 }

@@ -18,6 +18,7 @@ based system that would record data monitored by the server.
     - Animations (Block placing/breaking, attacking, eating)
     - Block placing/breaking
     - Chest opening/closing
+    - Effects
 - Replaying:
     - Movement (only Player)
     - Damage
@@ -26,6 +27,7 @@ based system that would record data monitored by the server.
     - Animations (Block placing/breaking, attacking, eating)
     - Block placing/breaking
     - Chest opening/closing
+    - Effects
     
 This framework aims to record every single moment with as much accuracy as
 possible. The current features are as of API `1.0`. 
@@ -101,41 +103,25 @@ If it was recording, you can specify optional arguments for
 save to a file or database. These optional arguments are:
 ```php
 /** @var \libReplay\ReplayServer $replayServer */
-$replayServer->toggleRecord(saveRecording: true, recordingName: 'MyReplay');
+$replayServer->toggleRecord(saveRecording: true, extraSaveData: []);
 ```
 **Note: These optional arguments are only used if the recording is being
 stopped. Furthermore, `recordingName` is only used if `saveRecording` is set
-to `true`.**
+to `true`. Extra save data is so you can save confirmation/other types of data
+for verification and handling.**
     
 #### Saving/Loading a replay
 
 The framework is designed for saving replays exceptionally well without data
-corruption. The format is based of NBT (Named Binary Tag). Anyhow, the high-level API
+corruption. The format is based of Zstandard rules and regulations. Anyhow, the high-level API
 provides a method-based wrapper to ensure we can get a save-able replay very
-easily. First we fetch the replay from `ReplayServer` like so:
+easily. The `\libReplay\event\ReplayComposedEvent` is called when a replay has finished being
+compressed. You can fetch the data from that event and save a replay.
+
+To load a replay after getting replay data back (This is not multi-threaded):
 ```php
-/** @var \libReplay\ReplayServer $replayServer */
-/** @var \libReplay\data\Replay|null $replay */
-$replay = $replayServer->getReplayByName(name: 'MyReplay');
-```
-Then check if the replay is actually a `Replay` object, and then compress it
-into a string.
-```php
-/** @var \libReplay\data\Replay|null $replay */
-if ($replay instanceof \libReplay\data\Replay) {
-    /** @var string $replayCompressed */
-    $replayCompressed = \libReplay\data\ReplayCompressor::compress($replay);
-    // Do whatever you want with the replay as a string.
-}
-```
-To load a replay (get the `Replay`) object back:
-```php
-/** @var string $replayCompressed */
-/** @var \libReplay\data\Replay|null $replay */
-$replay = \libReplay\data\ReplayCompressor::decompress($replayCompressed);
-if ($replay instanceof \libReplay\data\Replay) {
-    // Do whatever you want with the \libReplay\data\Replay object.
-}
+$replayCompressed = new \libReplay\data\ReplayCompressed(memory: '');
+$replay = $replayCompressed->decompress();
 ```
 
 #### Playing a replay
@@ -150,12 +136,13 @@ To play a replay, you must create a new `libReplay\ReplayViewer`. This viewer,
 views (plays) the replay. You can play a replay easily like so:
 ```php
 /** @var \libReplay\data\Replay $replay */
+/** @var \pocketmine\level\Level $level */
 /** @var \libReplay\ReplayViewer $replayViewer */
-$replayViewer = new \libReplay\ReplayViewer($replay);
+$replayViewer = new \libReplay\ReplayViewer($replay, $level);
 $replayViewer->play();
 ```
-This will automatically load the level if it exists, else it'll throw an
-exception which if not caught, will go and cause an internal error.
+
+Loading the level and teleporting the players is not the framework's responsibility.
 
 ## Disclaimer:
 

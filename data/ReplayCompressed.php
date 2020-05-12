@@ -12,8 +12,6 @@ use libReplay\task\ReplayCompressionTask;
 /**
  * Class ReplayCompressed
  * @package libReplay\data
- *
- * @internal
  */
 class ReplayCompressed
 {
@@ -23,6 +21,11 @@ class ReplayCompressed
     /** @var float */
     private $version;
 
+    /**
+     * ReplayCompressed constructor.
+     * @param string $memory
+     * @param float $version
+     */
     public function __construct(string $memory, float $version = ReplayServer::API)
     {
         $this->memory = $memory;

@@ -24,6 +24,8 @@ class ReplayComposedEvent extends PluginEvent
      * ReplayComposedEvent constructor.
      * @param ReplayCompressed $replay
      * @param array $extraData
+     *
+     * @internal
      */
     public function __construct(ReplayCompressed $replay, array $extraData)
     {

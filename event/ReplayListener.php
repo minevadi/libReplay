@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace libReplay\data;
+namespace libReplay\event;
 
 use libPhysX\internal\Rotation;
 use libReplay\data\entry\AnimationEntry;
@@ -97,7 +97,6 @@ class ReplayListener implements Listener
         $clientId = $client->getClientId();
         $entry = new SpawnStateEntry($clientId, false); // keepInventory: false
         $this->replayServer->addEntryToTickMemory($entry);
-        return;
     }
 
     /**
@@ -126,7 +125,6 @@ class ReplayListener implements Listener
         $this->replayServer->addEntryToTickMemory($entry);
         $entry = new SpawnStateEntry($clientId, true); // keepInventory: false
         $this->replayServer->addEntryToTickMemory($entry);
-        return;
     }
 
     /**
@@ -161,7 +159,6 @@ class ReplayListener implements Listener
         }
         $entry = new TransformEntry($clientId, $safePosition, $rotation, $state, $speed);
         $this->replayServer->addEntryToTickMemory($entry);
-        return;
     }
 
     /**
@@ -196,7 +193,6 @@ class ReplayListener implements Listener
                 true);
             $this->replayServer->addEntryToTickMemory($entry);
         }
-        return;
     }
 
     /**
@@ -221,7 +217,6 @@ class ReplayListener implements Listener
             $clientId = $client->getClientId();
             $this->addAnimationEntry($clientId); // using default animation.
         }
-        return;
     }
 
     /**
@@ -247,7 +242,6 @@ class ReplayListener implements Listener
             $clientId = $client->getClientId();
             $this->addAnimationEntry($clientId, AnimationEntry::ANIMATION_ITEM_CONSUME);
         }
-        return;
     }
 
     /**
@@ -275,7 +269,6 @@ class ReplayListener implements Listener
             $entry = new TakeDamageEntry($clientId, $damage, $cause);
             $this->replayServer->addEntryToTickMemory($entry);
         }
-        return;
     }
 
     /**
@@ -303,7 +296,6 @@ class ReplayListener implements Listener
             $entry = new RegainHealthEntry($clientId, $healthRegained, $reason);
             $this->replayServer->addEntryToTickMemory($entry);
         }
-        return;
     }
 
     /**
@@ -332,7 +324,6 @@ class ReplayListener implements Listener
         $entry = new BlockPlaceEntry($clientId, $safePosition, $blockId, $blockMeta);
         $this->addAnimationEntry($clientId); // using default animation.
         $this->replayServer->addEntryToTickMemory($entry);
-        return;
     }
 
     /**
@@ -359,7 +350,6 @@ class ReplayListener implements Listener
         $entry = new BlockBreakEntry($clientId, $safePosition);
         $this->addAnimationEntry($clientId); // using default animation.
         $this->replayServer->addEntryToTickMemory($entry);
-        return;
     }
 
     /**
@@ -397,7 +387,6 @@ class ReplayListener implements Listener
                 }
             }
         }
-        return;
     }
 
     /**
@@ -431,7 +420,6 @@ class ReplayListener implements Listener
         $safePosition = $position->asVector3();
         $entry = new ChestInteractionEntry($clientId, ChestInteractionEntry::TYPE_CHEST_OPEN, $safePosition);
         $this->replayServer->addEntryToTickMemory($entry);
-        return;
     }
 
     /**
@@ -494,7 +482,6 @@ class ReplayListener implements Listener
             $entry = new EffectEntry($clientId, $effectId, $level, $duration, true);
             $this->replayServer->addEntryToTickMemory($entry);
         }
-        return;
     }
 
 }
