@@ -1,6 +1,10 @@
 # libReplay
 A high-level replay framework for NetherGames. API `1.0` - Codename: Underdog.
 
+### PHP Requirements:
+- PHP 7.3 ZTS (only version we're supporting)
+- php-ext-zstd (0.8.0)
+
 ### About:
 This framework is meant to be used on NetherGames Production Servers. Hence, the
 main goal is to provide a performance-optimized framework. The framework relies
