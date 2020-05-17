@@ -39,6 +39,7 @@ class ReplayServer
     /** @var ReplayServer[] */
     private static $serverList = [];
 
+    /** @var bool */
     private static $status = self::DISABLED;
 
     /**
