@@ -14,6 +14,7 @@ use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\plugin\PluginManager;
+use RuntimeException;
 
 /**
  * Class ReplayServer
@@ -25,12 +26,20 @@ class ReplayServer
     /** @var float The API version. */
     public const API = 1.0;
 
+    private const PHP_EXT_ZSTD = 'zstd';
+    private const ENABLED = true;
+    private const DISABLED = false;
+
     /** @var PluginBase */
     private static $plugin;
     /** @var PluginManager */
     private static $pluginManager;
+    /** @var NGThreadPool */
+    private static $threadPool;
     /** @var ReplayServer[] */
     private static $serverList = [];
+
+    private static $status = self::DISABLED;
 
     /**
      * Setup the ReplayServer.
@@ -40,9 +49,14 @@ class ReplayServer
      */
     public static function setup(PluginBase $plugin): void
     {
+        if (!extension_loaded(self::PHP_EXT_ZSTD)) {
+            throw new RuntimeException('The Zstandard extension cannot be found.');
+        }
         self::$plugin = $plugin;
         self::$pluginManager = $plugin->getServer()->getPluginManager();
+        self::$threadPool = NGThreadPool::getInstance();
         ReplayViewer::setup();
+        self::$status = self::ENABLED;
     }
 
     /**
@@ -129,6 +143,9 @@ class ReplayServer
      */
     public function __construct(array $playerList, Level $level)
     {
+        if (!self::$status) {
+            throw new RuntimeException('The replay system has not been setup properly');
+        }
         foreach ($playerList as $player) {
             $this->addClientFromPlayer($player);
         }
@@ -304,7 +321,7 @@ class ReplayServer
                 $this->compressionTask->addClientData($connectedClient->convertToNonVolatile());
             }
             $this->compressionTask->storeExtraData($extraSaveData);
-            NGThreadPool::getInstance()->submitTask($this->compressionTask);
+            self::$threadPool->submitTask($this->compressionTask);
             unset(self::$serverList[array_search($this, self::$serverList)]);
         }
     }
