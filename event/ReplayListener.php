@@ -151,12 +151,7 @@ class ReplayListener implements Listener
         $safePosition = $position->asVector3();
         $rotation = new Rotation($player->yaw, $player->pitch);
         $state = TransformEntry::getTransformStateFromPlayer($player);
-        $lastTickedPosition = $player->getLastTickedPosition();
         $speed = 0.25; // default speed: 1 / 4.
-        if ($lastTickedPosition instanceof Vector3) {
-            // might require normalization.
-            $speed = $player->distance($lastTickedPosition);
-        }
         $entry = new TransformEntry($clientId, $safePosition, $rotation, $state, $speed);
         $this->replayServer->addEntryToTickMemory($entry);
     }
