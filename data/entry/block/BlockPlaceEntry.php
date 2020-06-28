@@ -31,7 +31,8 @@ class BlockPlaceEntry extends BlockEntry
         }
         $isValid = array_key_exists(self::TAG_BLOCK_ID, $nonVolatileEntry) &&
             array_key_exists(self::TAG_BLOCK_META, $nonVolatileEntry);
-        if ($isValid) {;
+        if ($isValid) {
+            ;
             return new self(
                 $clientId,
                 $position,

@@ -6,7 +6,7 @@ namespace libReplay\data\entry;
 
 use libPhysX\internal\Rotation;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 /**
  * Class TransformEntry
@@ -45,7 +45,7 @@ class TransformEntry extends DataEntry
             array_key_exists(self::TAG_SPEED, $nonVolatileEntry) &&
             array_key_exists(self::TAG_TELEPORT, $nonVolatileEntry);
         if ($isValid) {
-            $position = new Vector3();
+            $position = new Vector3(0,0,0);
             $positionProperty = $nonVolatileEntry[self::TAG_POSITION];
             $positionIsValid = array_key_exists(self::TAG_X, $positionProperty) &&
                 array_key_exists(self::TAG_Y, $positionProperty) &&

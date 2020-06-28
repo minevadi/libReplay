@@ -7,7 +7,7 @@ namespace libReplay;
 use libPhysX\internal\Rotation;
 use pocketmine\entity\Skin;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 /**
  * Class ReplayClient
@@ -111,8 +111,9 @@ class ReplayClient
         $customName = $player->getNameTag();
         $player->saveNBT();
         $skin = $player->getSkin();
-        $position = $player->asVector3();
-        $rotation = new Rotation($player->yaw, $player->pitch);
+        $location = $player->getLocation();
+        $position = $location->asVector3();
+        $rotation = new Rotation($location->yaw, $location->pitch);
         return new self($clientId, $skin, $position, $rotation, $customName);
     }
 

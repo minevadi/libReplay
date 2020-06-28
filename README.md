@@ -83,7 +83,7 @@ server is just the level and a bunch of connected clients. Only the connected
 clients are recorded. This can be done very simply too:
 ```php
 $playerListToRecord = array<Player>;
-$replayServer = new \libReplay\ReplayServer($playerListToRecord, <RecordedLevel>);
+$replayServer = new \libReplay\ReplayServer($playerListToRecord, <RecordedWorld>);
 ```
 That's all. Simple.
     
@@ -140,9 +140,9 @@ To play a replay, you must create a new `libReplay\ReplayViewer`. This viewer,
 views (plays) the replay. You can play a replay easily like so:
 ```php
 /** @var \libReplay\data\Replay $replay */
-/** @var \pocketmine\level\Level $level */
+/** @var \pocketmine\world\World $world */
 /** @var \libReplay\ReplayViewer $replayViewer */
-$replayViewer = new \libReplay\ReplayViewer($replay, $level);
+$replayViewer = new \libReplay\ReplayViewer($replay, $world);
 $replayViewer->play();
 ```
 

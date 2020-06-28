@@ -42,7 +42,7 @@ class ReplayCompressionTask extends AsyncTask
      */
     public function storeExtraData(array $extraData): void
     {
-        $this->storeLocal($extraData);
+        $this->storeLocal('extraData', $extraData);
     }
 
     /**
@@ -89,14 +89,14 @@ class ReplayCompressionTask extends AsyncTask
     /**
      * @inheritDoc
      */
-    public function onCompletion(Server $server): void
+    public function onCompletion(): void
     {
         $replay = new ReplayCompressed($this->compressedMemory);
         $extraData = [];
         try {
-            $extraData = $this->fetchLocal();
+            $extraData = $this->fetchLocal('extraData');
         } catch (BadMethodCallException $exception) {
-            $server->getLogger()->info('A replay was compressed without any extra data.');
+            Server::getInstance()->getLogger()->info('A replay was compressed without any extra data.');
         }
         $event = new ReplayComposedEvent($replay, $extraData);
         $event->call();

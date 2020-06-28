@@ -8,8 +8,14 @@ use libReplay\actor\HumanActor;
 use libReplay\data\entry\DataEntry;
 use libReplay\data\Replay;
 use pocketmine\entity\Entity;
-use pocketmine\level\Level;
+use pocketmine\entity\EntityDataHelper;
+use pocketmine\entity\EntityFactory;
+use pocketmine\entity\Location;
+use pocketmine\entity\projectile\Egg;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityLegacyIds;
 use pocketmine\utils\TextFormat;
+use pocketmine\world\World;
 
 /**
  * Class ReplayViewer
@@ -17,23 +23,12 @@ use pocketmine\utils\TextFormat;
  */
 class ReplayViewer
 {
-
-    /**
-     * Setup the replay player.
-     *
-     * @return void
-     */
-    public static function setup(): void
-    {
-        Entity::registerEntity(HumanActor::class, true);
-    }
-
     /** @var Replay */
     private $replay;
     /** @var HumanActor[] */
     private $actorList;
-    /** @var Level */
-    private $level;
+    /** @var World */
+    private $world;
     /** @var DataEntry[][] */
     private $unassignedDataEntryMemory;
 
@@ -43,12 +38,12 @@ class ReplayViewer
     /**
      * ReplayViewer constructor.
      * @param Replay $replay
-     * @param Level $level
+     * @param World $world
      */
-    public function __construct(Replay $replay, Level $level)
+    public function __construct(Replay $replay, World $world)
     {
         $this->replay = $replay;
-        $this->level = $level;
+        $this->world = $world;
         $this->unassignedDataEntryMemory = $replay->getDataEntryMemory();
         $this->setupActorList();
     }
@@ -66,12 +61,15 @@ class ReplayViewer
             $position = $client->getPosition();
             $rotation = $client->getRotation();
             $skin = $client->getSkin();
-            $nbt = Entity::createBaseNBT($position, null, $rotation->yaw, $rotation->pitch);
-            $this->actorList[$clientId] = new HumanActor($this->level, $nbt, $skin);
+
+            $this->actorList[$clientId] = new HumanActor(Location::fromObject($position, $this->world, $rotation->yaw, $rotation->pitch), $skin);
+
             $customName = $client->getCustomName();
             $this->actorList[$clientId]->setNameTag($customName);
-            $scoreTag = TextFormat::WHITE . TextFormat::BOLD . '10' .  TextFormat::RED . ' ❤';
+
+            $scoreTag = TextFormat::WHITE . TextFormat::BOLD . '10' . TextFormat::RED . ' ❤';
             $this->actorList[$clientId]->setScoreTag($scoreTag);
+
             /** @var DataEntry[][] $clientScript */
             $clientScript = [];
             foreach ($this->unassignedDataEntryMemory as $tick => $dataEntryList) {

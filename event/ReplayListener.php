@@ -18,6 +18,8 @@ use libReplay\data\entry\TransformEntry;
 use libReplay\ReplayClient;
 use libReplay\ReplayServer;
 use NetherGames\NGEssentials\player\NGPlayer;
+use pocketmine\block\inventory\ChestInventory;
+use pocketmine\block\tile\Chest;
 use pocketmine\entity\projectile\EnderPearl;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
@@ -34,12 +36,9 @@ use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerItemConsumeEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerRespawnEvent;
-use pocketmine\inventory\ChestInventory;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Consumable;
-use pocketmine\math\Vector3;
-use pocketmine\Player;
-use pocketmine\tile\Chest;
+use pocketmine\player\Player;
 
 /**
  * Class ReplayListener
@@ -119,7 +118,8 @@ class ReplayListener implements Listener
         $clientId = $client->getClientId();
         $position = $event->getRespawnPosition();
         $safePosition = $position->asVector3();
-        $rotation = new Rotation($player->yaw, $player->pitch);
+        $location = $player->getLocation();
+        $rotation = new Rotation($location->yaw, $location->pitch);
         $entry = new TransformEntry($clientId, $safePosition, $rotation, TransformEntry::STATE_DEFAULT, 0,
             true); // speed: 0 because teleport: true
         $this->replayServer->addEntryToTickMemory($entry);
@@ -149,7 +149,8 @@ class ReplayListener implements Listener
         $clientId = $client->getClientId();
         $position = $event->getTo();
         $safePosition = $position->asVector3();
-        $rotation = new Rotation($player->yaw, $player->pitch);
+        $location = $player->getLocation();
+        $rotation = new Rotation($location->yaw, $location->pitch);
         $state = TransformEntry::getTransformStateFromPlayer($player);
         $speed = 0.25; // default speed: 1 / 4.
         $entry = new TransformEntry($clientId, $safePosition, $rotation, $state, $speed);
@@ -183,7 +184,8 @@ class ReplayListener implements Listener
             $rayTraceResult = $event->getRayTraceResult();
             $target = $rayTraceResult->getHitVector();
             $safePosition = $target->asVector3();
-            $rotation = new Rotation($expectedPlayer->yaw, $expectedPlayer->pitch);
+            $location = $expectedPlayer->getLocation();
+            $rotation = new Rotation($location->yaw, $location->pitch);
             $entry = new TransformEntry($clientId, $safePosition, $rotation, TransformEntry::STATE_DEFAULT, 0,
                 true);
             $this->replayServer->addEntryToTickMemory($entry);
@@ -313,9 +315,9 @@ class ReplayListener implements Listener
         }
         $clientId = $client->getClientId();
         $block = $event->getBlock();
-        $safePosition = $block->asVector3();
+        $safePosition = $block->getPos()->asVector3();
         $blockId = $block->getId();
-        $blockMeta = $block->getDamage();
+        $blockMeta = $block->getMeta();
         $entry = new BlockPlaceEntry($clientId, $safePosition, $blockId, $blockMeta);
         $this->addAnimationEntry($clientId); // using default animation.
         $this->replayServer->addEntryToTickMemory($entry);
@@ -341,7 +343,7 @@ class ReplayListener implements Listener
         }
         $clientId = $client->getClientId();
         $block = $event->getBlock();
-        $safePosition = $block->asVector3();
+        $safePosition = $block->getPos()->asVector3();
         $entry = new BlockBreakEntry($clientId, $safePosition);
         $this->addAnimationEntry($clientId); // using default animation.
         $this->replayServer->addEntryToTickMemory($entry);
@@ -412,7 +414,7 @@ class ReplayListener implements Listener
             return;
         }
         $position = $holder->getBlock();
-        $safePosition = $position->asVector3();
+        $safePosition = $position->getPos()->asVector3();
         $entry = new ChestInteractionEntry($clientId, ChestInteractionEntry::TYPE_CHEST_OPEN, $safePosition);
         $this->replayServer->addEntryToTickMemory($entry);
     }
@@ -445,7 +447,7 @@ class ReplayListener implements Listener
             return;
         }
         $position = $holder->getBlock();
-        $safePosition = $position->asVector3();
+        $safePosition = $position->getPos()->asVector3();
         $entry = new ChestInteractionEntry($clientId, ChestInteractionEntry::TYPE_CHEST_CLOSE, $safePosition);
         $this->replayServer->addEntryToTickMemory($entry);
     }
@@ -472,9 +474,9 @@ class ReplayListener implements Listener
             $clientId = $client->getClientId();
             $effect = $event->getEffect();
             $effectId = $effect->getId();
-            $level = $effect->getEffectLevel();
+            $world = $effect->getEffectLevel();
             $duration = $effect->getDuration();
-            $entry = new EffectEntry($clientId, $effectId, $level, $duration, true);
+            $entry = new EffectEntry($clientId, $effectId, $world, $duration, true);
             $this->replayServer->addEntryToTickMemory($entry);
         }
     }

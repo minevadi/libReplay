@@ -10,10 +10,10 @@ use libReplay\task\CaptureTask;
 use libReplay\task\ReplayCompressionTask;
 use NetherGames\NGEssentials\thread\NGThreadPool;
 use pocketmine\event\HandlerList;
-use pocketmine\level\Level;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\plugin\PluginManager;
+use pocketmine\world\World;
 use RuntimeException;
 
 /**
@@ -56,7 +56,6 @@ class ReplayServer
         self::$plugin = $plugin;
         self::$pluginManager = $plugin->getServer()->getPluginManager();
         self::$threadPool = NGThreadPool::getInstance();
-        ReplayViewer::setup();
         self::$status = self::ENABLED;
     }
 
@@ -104,16 +103,16 @@ class ReplayServer
      * instantiated & recording on a specific
      * level.
      *
-     * @param Level $level
+     * @param World $world
      * @return ReplayServer[]
      */
-    public static function getRecordingServerListByLevel(Level $level): array
+    public static function getRecordingServerListByWorld(World $world): array
     {
         $recordingServerList = [];
         foreach (self::$serverList as $server) {
             $isRecording = $server->isRecording();
-            $serverLevel = $server->getLevel();
-            if ($isRecording && $serverLevel === $level) {
+            $serverWorld = $server->getWorld();
+            if ($isRecording && $serverWorld === $world) {
                 $recordingServerList[] = $server;
             }
         }
@@ -122,8 +121,8 @@ class ReplayServer
 
     /** @var ReplayClient[] */
     private $connectedClientList = [];
-    /** @var Level */
-    private $level;
+    /** @var World */
+    private $world;
 
     /** @var DataEntry[] */
     private $currentTickDataEntryMemory = [];
@@ -140,9 +139,9 @@ class ReplayServer
     /**
      * ReplayServer constructor.
      * @param Player[] $playerList
-     * @param Level $level
+     * @param World $world
      */
-    public function __construct(array $playerList, Level $level)
+    public function __construct(array $playerList, World $world)
     {
         if (!self::$status) {
             throw new RuntimeException('The replay system has not been setup properly');
@@ -150,7 +149,7 @@ class ReplayServer
         foreach ($playerList as $player) {
             $this->addClientFromPlayer($player);
         }
-        $this->level = $level;
+        $this->world = $world;
         self::$serverList[] = $this;
     }
 
@@ -222,14 +221,14 @@ class ReplayServer
     }
 
     /**
-     * Get the Level for which the server is currently
+     * Get the World for which the server is currently
      * running on.
      *
-     * @return Level
+     * @return World
      */
-    public function getLevel(): Level
+    public function getWorld(): World
     {
-        return $this->level;
+        return $this->world;
     }
 
     /**
@@ -249,21 +248,20 @@ class ReplayServer
      * Capture the tick's entries into a safe long-term
      * memory storage.
      *
-     * @param int $currentTick
      * @return void
      */
-    public function capture(int $currentTick): void
+    public function capture(): void
     {
         /**
-        $this->dataEntryMemory[$currentTick] = $this->currentTickDataEntryMemory;
-        $this->currentTickDataEntryMemory = [];
+         * $this->dataEntryMemory[$currentTick] = $this->currentTickDataEntryMemory;
+         * $this->currentTickDataEntryMemory = [];
          */
         $threadSafeTickMemory = [];
         foreach ($this->currentTickDataEntryMemory as $stepStamp => $dataEntry) {
             $threadSafeTickMemory[$stepStamp] = $dataEntry->convertToNonVolatile();
         }
         $this->currentTickDataEntryMemory = [];
-        $this->compressionTask->addCurrentTickToMemory($currentTick, $threadSafeTickMemory);
+        $this->compressionTask->addCurrentTickToMemory($this->getWorld()->getServer()->getTick(), $threadSafeTickMemory);
     }
 
     /**
@@ -302,7 +300,7 @@ class ReplayServer
 
         // stop recording and possibly save
         if ($this->replayListener instanceof ReplayListener) {
-            HandlerList::unregisterAll($this->replayListener);
+            HandlerList::unregister($this->replayListener);
             unset($this->replayListener);
         }
         if ($this->captureTask instanceof CaptureTask) {
@@ -313,10 +311,10 @@ class ReplayServer
 
         if ($saveRecording) {
             /**
-            $replay = new Replay($this->dataEntryMemory, $this->connectedClientList, $this->referenceLevelName);
-            $this->savedRecording[$recordingName] = $replay;
-            $this->currentTickDataEntryMemory = [];
-            $this->dataEntryMemory = [];
+             * $replay = new Replay($this->dataEntryMemory, $this->connectedClientList, $this->referenceWorldName);
+             * $this->savedRecording[$recordingName] = $replay;
+             * $this->currentTickDataEntryMemory = [];
+             * $this->dataEntryMemory = [];
              */
             foreach ($this->connectedClientList as $connectedClient) {
                 $this->compressionTask->addClientData($connectedClient->convertToNonVolatile());

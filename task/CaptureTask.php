@@ -29,12 +29,11 @@ class CaptureTask extends Task
     }
 
     /**
-     * @param int $currentTick
      * @return void
      */
-    public function onRun(int $currentTick): void
+    public function onRun(): void
     {
-        $this->replayServer->capture($currentTick);
+        $this->replayServer->capture();
     }
 
 }

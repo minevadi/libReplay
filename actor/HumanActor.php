@@ -21,29 +21,23 @@ use libReplay\ReplayViewer;
 use NetherGames\NGEssentials\utils\packets\PacketManager;
 use NetherGames\NGEssentials\utils\packets\PublicQueue;
 use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockIds;
-use pocketmine\entity\Effect;
-use pocketmine\entity\EffectInstance;
+use pocketmine\block\VanillaBlocks;
+use pocketmine\entity\effect\EffectInstance;
+use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\entity\Human;
-use pocketmine\entity\Skin;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityRegainHealthEvent;
 use pocketmine\inventory\ArmorInventory;
 use pocketmine\inventory\PlayerInventory;
 use pocketmine\item\Item;
-use pocketmine\level\ChunkLoader;
-use pocketmine\level\format\Chunk;
-use pocketmine\level\Level;
-use pocketmine\math\Vector3;
-use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\network\mcpe\protocol\AnimatePacket;
 use pocketmine\network\mcpe\protocol\BlockEventPacket;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;
-use pocketmine\utils\Color;
+use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\utils\TextFormat;
-use RuntimeException;
+use pocketmine\world\ChunkLoader;
 use function round;
 
 /**
@@ -67,23 +61,10 @@ class HumanActor extends Human implements ChunkLoader
     private $script;
     /** @var int */
     private $step;
-    /** @var Level This is a hack to go around PM's bad level|null checks. */
-    private $replayLevel;
     /** @var Item[][] */
     private $emulatedInventoryList = [];
     /** @var PublicQueue */
     private $packetQueue;
-    /** @var int THIS 0 IS IMPORTANT*/
-    private $loaderId = 0;
-
-    public function __construct(Level $level, CompoundTag $nbt, Skin $skin)
-    {
-        $this->setSkin($skin);
-
-        parent::__construct($level, $nbt);
-
-        $this->loaderId = Level::generateChunkLoaderId($this);
-    }
 
     /**
      * Configure the actor.
@@ -94,12 +75,6 @@ class HumanActor extends Human implements ChunkLoader
      */
     public function configure(ReplayViewer $replayViewer, array $script): void
     {
-        if ($this->level instanceof Level) {
-            $this->replayLevel = $this->level;
-        } else {
-            throw new RuntimeException('The level was found not "Level". This crashed the actor.');
-        }
-
         $this->replayViewer = $replayViewer;
         $this->script = $script;
         $baseKey = array_key_first($script);
@@ -123,16 +98,13 @@ class HumanActor extends Human implements ChunkLoader
      */
     public function entityBaseTick(int $tickDiff = 1): bool
     {
-        if (!$this->replayLevel instanceof Level) {
-            $this->flagForDespawn();
-            return parent::entityBaseTick($tickDiff);
-        }
         $flaggedForDespawn = $this->isFlaggedForDespawn();
         if ($flaggedForDespawn) {
             return parent::entityBaseTick($tickDiff);
         }
+
         $playbackSpeed = $this->replayViewer->getPlaybackSpeed();
-        $playerList = $this->replayLevel->getPlayers();
+        $playerList = $this->getWorld()->getPlayers();
         $this->packetQueue->setPlayers($playerList);
         for ($i = 0; $i < $playbackSpeed; ++$i) {
             $this->handle();
@@ -247,14 +219,14 @@ class HumanActor extends Human implements ChunkLoader
         $state = $entry->getState();
         switch ($state) {
             case TransformEntry::STATE_SPRINT:
-                $this->setGenericFlag(self::DATA_FLAG_SPRINTING, true);
+                $this->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::SPRINTING, true);
                 break;
             case TransformEntry::STATE_SNEAK:
-                $this->setGenericFlag(self::DATA_FLAG_SNEAKING, true);
+                $this->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::SNEAKING, true);
                 break;
             case TransformEntry::STATE_DEFAULT:
-                $this->setGenericFlag(self::DATA_FLAG_SPRINTING, false);
-                $this->setGenericFlag(self::DATA_FLAG_SNEAKING, false);
+                $this->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::SPRINTING, false);
+                $this->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::SNEAKING, false);
                 break;
         }
         // $speed = $entry->getSpeed(); // switch to 0.25 for testing purposes when messing with this.
@@ -396,9 +368,9 @@ class HumanActor extends Human implements ChunkLoader
         }
         $blockId = $entry->getBlockId();
         $blockMeta = $entry->getBlockMeta();
-        $block = BlockFactory::get($blockId, $blockMeta);
+        $block = BlockFactory::getInstance()->get($blockId, $blockMeta);
         $position = $entry->getPosition();
-        $this->replayLevel->setBlock($position, $block);
+        $this->getWorld()->setBlock($position, $block);
         $key = array_search($entry, $this->script[$this->step], true);
         unset($this->script[$this->step][$key]);
     }
@@ -415,8 +387,8 @@ class HumanActor extends Human implements ChunkLoader
             throw new DataEntryException([$entry], 'An unrecoverable exception occurred. Wrong entry provided.');
         }
         $position = $entry->getPosition();
-        $block = BlockFactory::get(BlockIds::AIR);
-        $this->replayLevel->setBlock($position, $block);
+        $block = VanillaBlocks::AIR();
+        $this->getWorld()->setBlock($position, $block);
         $key = array_search($entry, $this->script[$this->step], true);
         unset($this->script[$this->step][$key]);
     }
@@ -442,8 +414,6 @@ class HumanActor extends Human implements ChunkLoader
         switch ($inventoryId) {
             case InventoryEditEntry::INVENTORY_BASE:
                 $this->inventory->setItemInHand($item);
-                $playerList = $this->replayLevel->getPlayers();
-                $this->inventory->sendHeldItem($playerList);
                 break;
             case InventoryEditEntry::INVENTORY_ARMOR:
                 $this->armorInventory->setItem($slot, $item);
@@ -495,10 +465,7 @@ class HumanActor extends Human implements ChunkLoader
         $effectId = $entry->getEffectId();
         $effectLevel = $entry->getLevel();
         $effectDuration = $entry->getDuration();
-        $color = new Color(100, 100, 100);
-        $effectType = new Effect($effectId, (string)$this->ticksLived, $color);
-        $effect = new EffectInstance($effectType, $effectDuration, $effectLevel, true);
-        $this->addEffect($effect);
+        $this->getEffects()->add(new EffectInstance(VanillaEffects::byMcpeId($effectId), $effectDuration, $effectLevel));
         $key = array_search($entry, $this->script[$this->step], true);
         unset($this->script[$this->step][$key]);
     }
@@ -546,47 +513,17 @@ class HumanActor extends Human implements ChunkLoader
      * @param EntityDamageEvent $source
      * @return void
      */
-    public function applyDamageModifiers(EntityDamageEvent $source): void {}
-
-    /**
-     * @inheritDoc
-     */
-    public function getLoaderId(): int
+    public function applyDamageModifiers(EntityDamageEvent $source): void
     {
-        return $this->loaderId;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function isLoaderActive(): bool
+    public function getX()
     {
-        return true;
+        return $this->getLocation()->getX();
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function onChunkChanged(Chunk $chunk): void {}
-
-    /**
-     * @inheritDoc
-     */
-    public function onChunkLoaded(Chunk $chunk): void {}
-
-    /**
-     * @inheritDoc
-     */
-    public function onChunkUnloaded(Chunk $chunk): void {}
-
-    /**
-     * @inheritDoc
-     */
-    public function onChunkPopulated(Chunk $chunk): void {}
-
-    /**
-     * @inheritDoc
-     */
-    public function onBlockChanged(Vector3 $block): void {}
-
+    public function getZ()
+    {
+        return $this->getLocation()->getZ();
+    }
 }

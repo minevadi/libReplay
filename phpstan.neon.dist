@@ -24,7 +24,7 @@ parameters:
     paths:
         - /source/src
     bootstrapFiles:
-        - phar:///pocketmine/PocketMine-MP.phar/vendor/autoload.php
+        - phar:///source/PharBuilder/PocketMine-MP.phar/vendor/autoload.php
     scanDirectories:
         - /source/src
         - /source/NGEssentials/src
