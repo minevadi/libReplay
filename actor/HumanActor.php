@@ -19,7 +19,6 @@ use libReplay\data\entry\TransformEntry;
 use libReplay\exception\DataEntryException;
 use libReplay\ReplayViewer;
 use NetherGames\NGEssentials\utils\packets\PacketManager;
-use NetherGames\NGEssentials\utils\packets\PublicQueue;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\entity\effect\EffectInstance;
@@ -63,7 +62,7 @@ class HumanActor extends Human implements ChunkLoader
     private $step;
     /** @var Item[][] */
     private $emulatedInventoryList = [];
-    /** @var PublicQueue */
+    /** @var PacketManager */
     private $packetQueue;
 
     /**
@@ -82,8 +81,7 @@ class HumanActor extends Human implements ChunkLoader
             $this->step = (int)$baseKey;
         }
 
-        $id = PacketManager::setup(true);
-        $this->packetQueue = PacketManager::getPublicQueue($id);
+        $this->packetQueue = PacketManager::getPacketQueue(PacketManager::new());
 
         $this->getInventory()->setHeldItemIndex(0);
         $this->setNameTagVisible(true);
@@ -108,7 +106,7 @@ class HumanActor extends Human implements ChunkLoader
         $this->packetQueue->setPlayers($playerList);
         for ($i = 0; $i < $playbackSpeed; ++$i) {
             $this->handle();
-            $this->packetQueue->deliverPackets(true);
+            $this->packetQueue->deliver();
         }
         return parent::entityBaseTick($tickDiff);
     }

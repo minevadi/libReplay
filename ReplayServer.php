@@ -10,6 +10,7 @@ use libReplay\task\CaptureTask;
 use libReplay\task\ReplayCompressionTask;
 use NetherGames\NGEssentials\thread\NGThreadPool;
 use pocketmine\event\HandlerList;
+use pocketmine\event\HandlerListManager;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\plugin\PluginManager;
@@ -300,7 +301,7 @@ class ReplayServer
 
         // stop recording and possibly save
         if ($this->replayListener instanceof ReplayListener) {
-            HandlerList::unregister($this->replayListener);
+            HandlerListManager::global()->unregisterAll($this->replayListener);
             unset($this->replayListener);
         }
         if ($this->captureTask instanceof CaptureTask) {

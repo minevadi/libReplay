@@ -28,8 +28,7 @@ class DataEntryException extends RuntimeException
     public function __construct(array $dataDump, $message = '', $code = 0, Throwable $previous = null)
     {
         $exportableDataDump = var_export($dataDump, true);
-        $stringCheck = is_string($exportableDataDump);
-        if (!$stringCheck) {
+        if (!$exportableDataDump === null) {
             $message = 'Data dump could not be collected.';
             parent::__construct($message, $code, $previous);
         }

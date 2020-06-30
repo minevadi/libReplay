@@ -20,6 +20,7 @@ use libReplay\ReplayServer;
 use NetherGames\NGEssentials\player\NGPlayer;
 use pocketmine\block\inventory\ChestInventory;
 use pocketmine\block\tile\Chest;
+use pocketmine\entity\FoodSource;
 use pocketmine\entity\projectile\EnderPearl;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
@@ -37,7 +38,7 @@ use pocketmine\event\player\PlayerItemConsumeEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerRespawnEvent;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
-use pocketmine\item\Consumable;
+use pocketmine\item\ConsumableItem;
 use pocketmine\player\Player;
 
 /**
@@ -226,7 +227,7 @@ class ReplayListener implements Listener
     public function handleEatAnimationEntry(PlayerItemConsumeEvent $event): void
     {
         $item = $event->getItem();
-        if ($item instanceof Consumable) {
+        if ($item instanceof FoodSource) {
             $player = $event->getPlayer();
             $client = $this->replayServer->getConnectedClientByPlayer($player);
             if (!$client instanceof ReplayClient) {
@@ -410,12 +411,7 @@ class ReplayListener implements Listener
         }
         $clientId = $client->getClientId();
         $holder = $inventory->getHolder();
-        if (!$holder instanceof Chest) {
-            return;
-        }
-        $position = $holder->getBlock();
-        $safePosition = $position->getPos()->asVector3();
-        $entry = new ChestInteractionEntry($clientId, ChestInteractionEntry::TYPE_CHEST_OPEN, $safePosition);
+        $entry = new ChestInteractionEntry($clientId, ChestInteractionEntry::TYPE_CHEST_OPEN, $holder);
         $this->replayServer->addEntryToTickMemory($entry);
     }
 
@@ -443,12 +439,7 @@ class ReplayListener implements Listener
         }
         $clientId = $client->getClientId();
         $holder = $inventory->getHolder();
-        if (!$holder instanceof Chest) {
-            return;
-        }
-        $position = $holder->getBlock();
-        $safePosition = $position->getPos()->asVector3();
-        $entry = new ChestInteractionEntry($clientId, ChestInteractionEntry::TYPE_CHEST_CLOSE, $safePosition);
+        $entry = new ChestInteractionEntry($clientId, ChestInteractionEntry::TYPE_CHEST_CLOSE, $holder);
         $this->replayServer->addEntryToTickMemory($entry);
     }
 
