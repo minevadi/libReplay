@@ -28,6 +28,7 @@ class ReplayDecompressor
     public static function decompress(string $data): array
     {
         if ($data !== null) {
+            /* @phpstan-ignore-next-line */
             $json = zstd_uncompress($data);
             if ($json !== false) {
                 $decompressedMemory = json_decode($json, true, 512, JSON_THROW_ON_ERROR);

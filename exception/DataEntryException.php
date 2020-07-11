@@ -29,6 +29,7 @@ class DataEntryException extends RuntimeException
     {
         $exportableDataDump = var_export($dataDump, true);
         $stringCheck = is_string($exportableDataDump);
+        /* @phpstan-ignore-next-line */
         if (!$stringCheck) {
             $message = 'Data dump could not be collected.';
             parent::__construct($message, $code, $previous);

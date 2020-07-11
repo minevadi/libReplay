@@ -23,6 +23,7 @@ class ReplayCompressionTask extends AsyncTask
     public const MEMORY_TYPE_REPLAY = 0;
     public const MEMORY_TYPE_CLIENT = 1;
 
+    /* @phpstan-ignore-next-line */
     private const COMPRESSION_LEVEL = ZSTD_COMPRESS_LEVEL_MAX;
 
     /** @var array */
