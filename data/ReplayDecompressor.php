@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace libReplay\data;
 
 use RuntimeException;
+use function is_string;
 
 /**
  * Static decompression class
@@ -28,9 +29,9 @@ class ReplayDecompressor
     public static function decompress(string $data): array
     {
         if ($data !== null) {
-            /* @phpstan-ignore-next-line */
             $json = zstd_uncompress($data);
-            if ($json !== false) {
+
+            if (is_string($json)) {
                 $decompressedMemory = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
                 if ($decompressedMemory !== false) {
                     return $decompressedMemory;
