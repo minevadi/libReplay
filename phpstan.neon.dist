@@ -3,28 +3,11 @@ parameters:
 
     checkMissingIterableValueType: false
 
-    ignoreErrors:
-        -
-            message: '#Negated boolean expression is always false.#'
-            count: 1
-            path: /source/src/exception/DataEntryException.php
-        -
-            message: '#Function zstd_uncompress not found.#'
-            count: 1
-            path: /source/src/data/ReplayDecompressor.php
-        -
-            message: '#Constant ZSTD_COMPRESS_LEVEL_MAX not found.#'
-            count: 1
-            path: /source/src/task/ReplayCompressionTask.php
-        -
-            message: '#Function zstd_compress not found.#'
-            count: 1
-            path: /source/src/task/ReplayCompressionTask.php
-
     paths:
         - /source/src
     bootstrapFiles:
         - phar:///source/PharBuilder/PocketMine-MP.phar/vendor/autoload.php
+        - /source/NGEssentials/src/libasyncio/stub/ZStandard/zstd.php
     scanDirectories:
         - /source/src
         - /source/NGEssentials/src

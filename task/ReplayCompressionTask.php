@@ -10,6 +10,7 @@ use libReplay\event\ReplayComposedEvent;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use RuntimeException;
+use function is_string;
 
 /**
  * Class ReplayCompressionTask
@@ -77,7 +78,7 @@ class ReplayCompressionTask extends AsyncTask
         if ($json !== false) {
             $compressedMemory = zstd_compress($json, self::COMPRESSION_LEVEL);
 
-            if ($compressedMemory !== false) {
+            if (is_string($compressedMemory)) {
                 $this->compressedMemory = $compressedMemory;
                 return;
             }
