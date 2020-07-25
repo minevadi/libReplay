@@ -7,6 +7,7 @@ parameters:
         - /source/src
     bootstrapFiles:
         - phar:///pocketmine/PocketMine-MP.phar/vendor/autoload.php
+        - /source/NGEssentials/src/libasyncio/stub/ZStandard/zstd.php
     scanDirectories:
         - /source/src
         - /source/NGEssentials/src
