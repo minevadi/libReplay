@@ -33,32 +33,64 @@ class TransformEntry extends DataEntry
     public const STATE_SNEAK = 2;
 
     private const SPEED_DEFAULT = 0.25;
+    /** @var Vector3 */
+    private Vector3 $position;
+    /** @var Rotation */
+    private Rotation $rotation;
+    /** @var int */
+    private int $state;
+    /** @var float */
+    private float $speed;
+    /** @var bool */
+    private bool $teleport;
+
+    /**
+     * TransformEntry constructor.
+     * @param string $clientId
+     * @param Vector3 $position
+     * @param Rotation $rotation
+     * @param int $state
+     * @param float $speed
+     * @param bool $teleport
+     */
+    public function __construct(string $clientId, Vector3 $position, Rotation $rotation, int $state,
+                                float $speed = self::SPEED_DEFAULT, bool $teleport = false)
+    {
+        $this->position = $position;
+        $this->rotation = $rotation;
+        $this->state = $state;
+        $this->speed = $speed;
+        $this->teleport = $teleport;
+        $this->entryType = EntryTypes::TRANSFORM;
+        parent::__construct($clientId);
+    }
 
     /**
      * @inheritDoc
      */
     public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
     {
-        $isValid = array_key_exists(self::TAG_POSITION, $nonVolatileEntry) &&
-            array_key_exists(self::TAG_ROTATION, $nonVolatileEntry) &&
-            array_key_exists(self::TAG_STATE, $nonVolatileEntry) &&
-            array_key_exists(self::TAG_SPEED, $nonVolatileEntry) &&
-            array_key_exists(self::TAG_TELEPORT, $nonVolatileEntry);
-        if ($isValid) {
+        if (isset(
+            $nonVolatileEntry[self::TAG_POSITION],
+            $nonVolatileEntry[self::TAG_ROTATION],
+            $nonVolatileEntry[self::TAG_STATE],
+            $nonVolatileEntry[self::TAG_SPEED],
+            $nonVolatileEntry[self::TAG_TELEPORT]
+        )) {
             $position = new Vector3();
             $positionProperty = $nonVolatileEntry[self::TAG_POSITION];
-            $positionIsValid = array_key_exists(self::TAG_X, $positionProperty) &&
-                array_key_exists(self::TAG_Y, $positionProperty) &&
-                array_key_exists(self::TAG_Z, $positionProperty);
-            if ($positionIsValid) {
+            if (isset(
+                $positionProperty[self::TAG_X],
+                $positionProperty[self::TAG_Y],
+                $positionProperty[self::TAG_Z]
+            )) {
                 $position->x = $positionProperty[self::TAG_X];
                 $position->y = $positionProperty[self::TAG_Y];
                 $position->z = $positionProperty[self::TAG_Z];
             }
             $rotation = new Rotation();
             $rotationProperty = $nonVolatileEntry[self::TAG_ROTATION];
-            $rotationIsValid = array_key_exists(self::TAG_YAW, $rotationProperty) &&
-                array_key_exists(self::TAG_PITCH, $rotationProperty);
+            $rotationIsValid = isset($rotationProperty[self::TAG_YAW], $rotationProperty[self::TAG_PITCH]);
             if ($rotationIsValid) {
                 $rotation->yaw = $rotationProperty[self::TAG_YAW];
                 $rotation->pitch = $rotationProperty[self::TAG_PITCH];
@@ -92,38 +124,6 @@ class TransformEntry extends DataEntry
             return self::STATE_SNEAK;
         }
         return self::STATE_DEFAULT;
-    }
-
-    /** @var Vector3 */
-    private $position;
-    /** @var Rotation */
-    private $rotation;
-    /** @var int */
-    private $state;
-    /** @var float */
-    private $speed;
-    /** @var bool */
-    private $teleport;
-
-    /**
-     * TransformEntry constructor.
-     * @param string $clientId
-     * @param Vector3 $position
-     * @param Rotation $rotation
-     * @param int $state
-     * @param float $speed
-     * @param bool $teleport
-     */
-    public function __construct(string $clientId, Vector3 $position, Rotation $rotation, int $state,
-                                float $speed = self::SPEED_DEFAULT, bool $teleport = false)
-    {
-        $this->position = $position;
-        $this->rotation = $rotation;
-        $this->state = $state;
-        $this->speed = $speed;
-        $this->teleport = $teleport;
-        $this->entryType = EntryTypes::TRANSFORM;
-        parent::__construct($clientId);
     }
 
     /**

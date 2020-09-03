@@ -24,21 +24,6 @@ class ChestInteractionEntry extends BlockEntry
     public const TYPE_CHEST_CLOSE = 3;
 
     /**
-     * @inheritDoc
-     */
-    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
-    {
-        $position = self::readPositionFromNonVolatile($nonVolatileEntry);
-        if ($position === null) {
-            return null;
-        }
-        if (array_key_exists(self::TAG_ACTION_TYPE, $nonVolatileEntry)) {
-            return new self($clientId, $nonVolatileEntry[self::TAG_ACTION_TYPE], $position);
-        }
-        return null;
-    }
-
-    /**
      * ChestInteractionEntry constructor.
      * @param string $clientId
      * @param int $actionType
@@ -56,6 +41,21 @@ class ChestInteractionEntry extends BlockEntry
         }
         $this->entryType = EntryTypes::CHEST_INTERACTION;
         parent::__construct($clientId, $actionType, $position);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
+    {
+        $position = self::readPositionFromNonVolatile($nonVolatileEntry);
+        if ($position === null) {
+            return null;
+        }
+        if (isset($nonVolatileEntry[self::TAG_ACTION_TYPE])) {
+            return new self($clientId, $nonVolatileEntry[self::TAG_ACTION_TYPE], $position);
+        }
+        return null;
     }
 
     /**

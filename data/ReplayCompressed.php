@@ -17,9 +17,9 @@ class ReplayCompressed
 {
 
     /** @var string */
-    private $memory;
+    private string $memory;
     /** @var float */
-    private $version;
+    private float $version;
 
     /**
      * ReplayCompressed constructor.
@@ -61,8 +61,7 @@ class ReplayCompressed
     public function decompress(): ?Replay
     {
         $memory = ReplayDecompressor::decompress($this->memory);
-        $validationCheck = array_key_exists(ReplayCompressionTask::MEMORY_TYPE_REPLAY, $memory) &&
-            array_key_exists(ReplayCompressionTask::MEMORY_TYPE_CLIENT, $memory);
+        $validationCheck = isset($memory[ReplayCompressionTask::MEMORY_TYPE_CLIENT], $memory[ReplayCompressionTask::MEMORY_TYPE_CLIENT]);
         if (!is_array($memory) || !$validationCheck) {
             return null;
         }

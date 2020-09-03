@@ -37,7 +37,6 @@ use pocketmine\event\player\PlayerRespawnEvent;
 use pocketmine\inventory\ChestInventory;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Consumable;
-use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\tile\Chest;
 
@@ -51,7 +50,7 @@ class ReplayListener implements Listener
 {
 
     /** @var ReplayServer */
-    private $replayServer;
+    private ReplayServer $replayServer;
 
     /**
      * ReplayListener constructor.
@@ -60,21 +59,6 @@ class ReplayListener implements Listener
     public function __construct(ReplayServer $replayServer)
     {
         $this->replayServer = $replayServer;
-    }
-
-    /**
-     * Add an animation entry.
-     *
-     * This method has been created due
-     * to repetitive adding of animations.
-     *
-     * @param string $clientId
-     * @param int $animation
-     */
-    public function addAnimationEntry(string $clientId, int $animation = AnimationEntry::ANIMATION_SWING_ARM): void
-    {
-        $entry = new AnimationEntry($clientId, $animation);
-        $this->replayServer->addEntryToTickMemory($entry);
     }
 
     /**
@@ -212,6 +196,21 @@ class ReplayListener implements Listener
             $clientId = $client->getClientId();
             $this->addAnimationEntry($clientId); // using default animation.
         }
+    }
+
+    /**
+     * Add an animation entry.
+     *
+     * This method has been created due
+     * to repetitive adding of animations.
+     *
+     * @param string $clientId
+     * @param int $animation
+     */
+    public function addAnimationEntry(string $clientId, int $animation = AnimationEntry::ANIMATION_SWING_ARM): void
+    {
+        $entry = new AnimationEntry($clientId, $animation);
+        $this->replayServer->addEntryToTickMemory($entry);
     }
 
     /**

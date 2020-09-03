@@ -18,28 +18,10 @@ class TakeDamageEntry extends DataEntry
 
     private const TAG_DAMAGE_TAKEN = 2;
     private const TAG_CAUSE = 3;
-
-    /**
-     * @inheritDoc
-     */
-    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
-    {
-        $isValid = array_key_exists(self::TAG_DAMAGE_TAKEN, $nonVolatileEntry) &&
-            array_key_exists(self::TAG_CAUSE, $nonVolatileEntry);
-        if ($isValid) {
-            return new self(
-                $clientId,
-                $nonVolatileEntry[self::TAG_DAMAGE_TAKEN],
-                $nonVolatileEntry[self::TAG_CAUSE]
-            );
-        }
-        return null;
-    }
-
     /** @var float */
-    private $damageTaken;
+    private float $damageTaken;
     /** @var int */
-    private $cause;
+    private int $cause;
 
     /**
      * TakeDamageEntry constructor.
@@ -62,6 +44,22 @@ class TakeDamageEntry extends DataEntry
         $this->cause = $cause;
         $this->entryType = EntryTypes::TAKE_DAMAGE;
         parent::__construct($clientId);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
+    {
+        $isValid = isset($nonVolatileEntry[self::TAG_DAMAGE_TAKEN], $nonVolatileEntry[self::TAG_CAUSE]);
+        if ($isValid) {
+            return new self(
+                $clientId,
+                $nonVolatileEntry[self::TAG_DAMAGE_TAKEN],
+                $nonVolatileEntry[self::TAG_CAUSE]
+            );
+        }
+        return null;
     }
 
     /**

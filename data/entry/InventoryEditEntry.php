@@ -24,54 +24,12 @@ class InventoryEditEntry extends DataEntry
     public const INVENTORY_INVALID = -1;
     public const INVENTORY_BASE = 0;
     public const INVENTORY_ARMOR = 1;
-
-    /**
-     * @inheritDoc
-     *
-     * @internal
-     */
-    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
-    {
-        $isValid = array_key_exists(self::TAG_INVENTORY_ID, $nonVolatileEntry) &&
-            array_key_exists(self::TAG_SLOT, $nonVolatileEntry) &&
-            array_key_exists(self::TAG_ITEM, $nonVolatileEntry);
-        if ($isValid) {
-            return new self(
-                $clientId,
-                $nonVolatileEntry[self::TAG_INVENTORY_ID],
-                $nonVolatileEntry[self::TAG_SLOT],
-                Item::jsonDeserialize($nonVolatileEntry[self::TAG_ITEM])
-            );
-        }
-        return null;
-    }
-
-    /**
-     * Get the right inventory id constant
-     * for the accepted inventories.
-     *
-     * Returns -1 if the inventory isn't accepted.
-     *
-     * @param Inventory $inventory
-     * @return int
-     */
-    public static function getInventoryIdFromInventory(Inventory $inventory): int
-    {
-        if ($inventory instanceof PlayerInventory) {
-            return self::INVENTORY_BASE;
-        }
-        if ($inventory instanceof ArmorInventory) {
-            return self::INVENTORY_ARMOR;
-        }
-        return self::INVENTORY_INVALID;
-    }
-
     /** @var int */
     private $inventoryId;
     /** @var int */
-    private $slot;
+    private int $slot;
     /** @var Item */
-    private $item;
+    private Item $item;
 
     /**
      * InventoryEditEntry constructor.
@@ -108,6 +66,45 @@ class InventoryEditEntry extends DataEntry
         $this->item = $item;
         $this->entryType = EntryTypes::INVENTORY_EDIT;
         parent::__construct($clientId);
+    }
+
+    /**
+     * @inheritDoc
+     *
+     * @internal
+     */
+    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
+    {
+        $isValid = isset($nonVolatileEntry[self::TAG_INVENTORY_ID], $nonVolatileEntry[self::TAG_SLOT], $nonVolatileEntry[self::TAG_ITEM]);
+        if ($isValid) {
+            return new self(
+                $clientId,
+                $nonVolatileEntry[self::TAG_INVENTORY_ID],
+                $nonVolatileEntry[self::TAG_SLOT],
+                Item::jsonDeserialize($nonVolatileEntry[self::TAG_ITEM])
+            );
+        }
+        return null;
+    }
+
+    /**
+     * Get the right inventory id constant
+     * for the accepted inventories.
+     *
+     * Returns -1 if the inventory isn't accepted.
+     *
+     * @param Inventory $inventory
+     * @return int
+     */
+    public static function getInventoryIdFromInventory(Inventory $inventory): int
+    {
+        if ($inventory instanceof PlayerInventory) {
+            return self::INVENTORY_BASE;
+        }
+        if ($inventory instanceof ArmorInventory) {
+            return self::INVENTORY_ARMOR;
+        }
+        return self::INVENTORY_INVALID;
     }
 
     /**

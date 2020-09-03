@@ -19,6 +19,19 @@ abstract class DataEntry
 
     protected const ENTRY_TYPE_TAG = 0;
     protected const CLIENT_ID_TAG = 1;
+    /** @var int */
+    protected $entryType = EntryTypes::DEFAULT;
+    /** @var string */
+    protected string $clientId;
+
+    /**
+     * DataEntry constructor.
+     * @param string $clientId
+     */
+    public function __construct(string $clientId)
+    {
+        $this->clientId = $clientId;
+    }
 
     /**
      * Read from a non-volatile data package.
@@ -28,8 +41,7 @@ abstract class DataEntry
      */
     public static function readFromNonVolatile(array $nonVolatileEntry): ?DataEntry
     {
-        $isValid = array_key_exists(self::ENTRY_TYPE_TAG, $nonVolatileEntry) &&
-            array_key_exists(self::CLIENT_ID_TAG, $nonVolatileEntry);
+        $isValid = isset($nonVolatileEntry[self::ENTRY_TYPE_TAG], $nonVolatileEntry[self::CLIENT_ID_TAG]);
         if ($isValid) {
             $clientId = $nonVolatileEntry[self::CLIENT_ID_TAG];
             switch ($nonVolatileEntry[self::ENTRY_TYPE_TAG]) {
@@ -66,20 +78,6 @@ abstract class DataEntry
      * @return DataEntry|null
      */
     abstract public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry;
-
-    /** @var int */
-    protected $entryType = EntryTypes::DEFAULT;
-    /** @var string */
-    protected $clientId;
-
-    /**
-     * DataEntry constructor.
-     * @param string $clientId
-     */
-    public function __construct(string $clientId)
-    {
-        $this->clientId = $clientId;
-    }
 
     /**
      * Get the entry type.

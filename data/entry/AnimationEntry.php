@@ -20,24 +20,10 @@ class AnimationEntry extends DataEntry
 
     public const ANIMATION_SWING_ARM = 0;
     public const ANIMATION_ITEM_CONSUME = 1;
-
-    /**
-     * @inheritDoc
-     */
-    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
-    {
-        $isValid = array_key_exists(self::TAG_ANIMATION, $nonVolatileEntry) &&
-            array_key_exists(self::TAG_DURATION, $nonVolatileEntry);
-        if ($isValid) {
-            return new self($clientId, $nonVolatileEntry[self::TAG_ANIMATION], $nonVolatileEntry[self::TAG_DURATION]);
-        }
-        return null;
-    }
-
     /** @var int */
-    private $animation;
+    private int $animation;
     /** @var int Duration in ms */
-    private $duration;
+    private int $duration;
 
     /**
      * AnimationEntry constructor.
@@ -59,6 +45,18 @@ class AnimationEntry extends DataEntry
         $this->duration = $duration;
         $this->entryType = EntryTypes::ANIMATION;
         parent::__construct($clientId);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
+    {
+        $isValid = isset($nonVolatileEntry[self::TAG_ANIMATION], $nonVolatileEntry[self::TAG_DURATION]);
+        if ($isValid) {
+            return new self($clientId, $nonVolatileEntry[self::TAG_ANIMATION], $nonVolatileEntry[self::TAG_DURATION]);
+        }
+        return null;
     }
 
     /**

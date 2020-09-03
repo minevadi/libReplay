@@ -18,28 +18,10 @@ class RegainHealthEntry extends DataEntry
 
     private const TAG_HEALTH_REGAINED = 2;
     private const TAG_REGAIN_REASON = 3;
-
-    /**
-     * @inheritDoc
-     */
-    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
-    {
-        $isValid = array_key_exists(self::TAG_HEALTH_REGAINED, $nonVolatileEntry) &&
-            array_key_exists(self::TAG_REGAIN_REASON, $nonVolatileEntry);
-        if ($isValid) {
-            return new self(
-                $clientId,
-                $nonVolatileEntry[self::TAG_HEALTH_REGAINED],
-                $nonVolatileEntry[self::TAG_REGAIN_REASON]
-            );
-        }
-        return null;
-    }
-
     /** @var float */
-    private $healthRegained;
+    private float $healthRegained;
     /** @var int */
-    private $regainReason;
+    private int $regainReason;
 
     /**
      * RegainHealthEntry constructor.
@@ -62,6 +44,22 @@ class RegainHealthEntry extends DataEntry
         $this->regainReason = $regainReason;
         $this->entryType = EntryTypes::REGAIN_HEALTH;
         parent::__construct($clientId);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
+    {
+        $isValid = isset($nonVolatileEntry[self::TAG_HEALTH_REGAINED], $nonVolatileEntry[self::TAG_REGAIN_REASON]);
+        if ($isValid) {
+            return new self(
+                $clientId,
+                $nonVolatileEntry[self::TAG_HEALTH_REGAINED],
+                $nonVolatileEntry[self::TAG_REGAIN_REASON]
+            );
+        }
+        return null;
     }
 
     /**

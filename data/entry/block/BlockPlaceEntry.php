@@ -17,35 +17,10 @@ class BlockPlaceEntry extends BlockEntry
 
     private const TAG_BLOCK_ID = 3;
     private const TAG_BLOCK_META = 4;
-
-    /**
-     * @inheritDoc
-     *
-     * @internal
-     */
-    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
-    {
-        $position = self::readPositionFromNonVolatile($nonVolatileEntry);
-        if ($position === null) {
-            return null;
-        }
-        $isValid = array_key_exists(self::TAG_BLOCK_ID, $nonVolatileEntry) &&
-            array_key_exists(self::TAG_BLOCK_META, $nonVolatileEntry);
-        if ($isValid) {;
-            return new self(
-                $clientId,
-                $position,
-                $nonVolatileEntry[self::TAG_BLOCK_ID],
-                $nonVolatileEntry[self::TAG_BLOCK_META]
-            );
-        }
-        return null;
-    }
-
     /** @var int */
-    private $blockId;
+    private int $blockId;
     /** @var int */
-    private $blockMeta;
+    private int $blockMeta;
 
     /**
      * BlockPlaceEntry constructor.
@@ -60,6 +35,29 @@ class BlockPlaceEntry extends BlockEntry
         $this->blockMeta = $blockMeta;
         $this->entryType = EntryTypes::BLOCK_PLACE;
         parent::__construct($clientId, self::TYPE_PLACE, $position);
+    }
+
+    /**
+     * @inheritDoc
+     *
+     * @internal
+     */
+    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
+    {
+        $position = self::readPositionFromNonVolatile($nonVolatileEntry);
+        if ($position === null) {
+            return null;
+        }
+        $isValid = isset($nonVolatileEntry[self::TAG_BLOCK_ID], $nonVolatileEntry[self::TAG_BLOCK_META]);
+        if ($isValid) {
+            return new self(
+                $clientId,
+                $position,
+                $nonVolatileEntry[self::TAG_BLOCK_ID],
+                $nonVolatileEntry[self::TAG_BLOCK_META]
+            );
+        }
+        return null;
     }
 
     /**

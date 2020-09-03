@@ -21,33 +21,10 @@ abstract class BlockEntry extends DataEntry
 
     protected const TYPE_BREAK = 0;
     protected const TYPE_PLACE = 1;
-
-    /**
-     * Read the position type from non-volatile.
-     *
-     * @param array $nonVolatileEntry
-     * @return Vector3|null
-     *
-     * @internal
-     */
-    protected static function readPositionFromNonVolatile(array $nonVolatileEntry): ?Vector3
-    {
-        if (array_key_exists(self::TAG_POSITION, $nonVolatileEntry)) {
-            $position = $nonVolatileEntry[self::TAG_POSITION];
-            $isValid = array_key_exists(self::TAG_X, $position) &&
-                array_key_exists(self::TAG_Y, $position) &&
-                array_key_exists(self::TAG_Z, $position);
-            if ($isValid) {
-                return new Vector3($position[self::TAG_X], $position[self::TAG_Y], $position[self::TAG_Z]);
-            }
-        }
-        return null;
-    }
-
     /** @var int */
-    private $actionType;
+    private int $actionType;
     /** @var Vector3 */
-    private $position;
+    private Vector3 $position;
 
     /**
      * BlockEntry constructor.
@@ -60,6 +37,30 @@ abstract class BlockEntry extends DataEntry
         $this->actionType = $actionType;
         $this->position = $position;
         parent::__construct($clientId);
+    }
+
+    /**
+     * Read the position type from non-volatile.
+     *
+     * @param array $nonVolatileEntry
+     * @return Vector3|null
+     *
+     * @internal
+     */
+    protected static function readPositionFromNonVolatile(array $nonVolatileEntry): ?Vector3
+    {
+        if (isset($nonVolatileEntry[self::TAG_POSITION])) {
+            $position = $nonVolatileEntry[self::TAG_POSITION];
+            $isValid = isset(
+                $position[self::TAG_X],
+                $position[self::TAG_Y],
+                $position[self::TAG_Z]
+            );
+            if ($isValid) {
+                return new Vector3($position[self::TAG_X], $position[self::TAG_Y], $position[self::TAG_Z]);
+            }
+        }
+        return null;
     }
 
     /**

@@ -32,6 +32,38 @@ class ReplayClient
     private const TAG_SKIN_CAPE_DATA = 2;
     private const TAG_SKIN_GEOMETRY_NAME = 3;
     private const TAG_SKIN_GEOMETRY_DATA = 4;
+    /** @var string This is the player's name */
+    private string $clientId;
+    /** @var Skin */
+    private Skin $skin;
+    /** @var Vector3 */
+    private Vector3 $position;
+    /** @var Rotation */
+    private Rotation $rotation;
+    /** @var string A custom name for the actor at replay time */
+    private string $customName;
+    /** @var bool */
+    private bool $recorded = false;
+
+    /**
+     * ReplayClient constructor.
+     * @param string $clientId
+     * @param Skin $skin
+     * @param Vector3 $position
+     * @param Rotation $rotation
+     * @param string $customName
+     *
+     * @internal
+     */
+    public function __construct(string $clientId, Skin $skin, Vector3 $position, Rotation $rotation,
+                                string $customName = '')
+    {
+        $this->clientId = $clientId;
+        $this->skin = $skin;
+        $this->position = $position;
+        $this->rotation = $rotation;
+        $this->customName = $customName;
+    }
 
     /**
      * Construct a client from non volatile.
@@ -43,17 +75,20 @@ class ReplayClient
      */
     public static function constructFromNonVolatile(array $nonVolatileClient): ?ReplayClient
     {
-        $isValid = array_key_exists(self::TAG_CLIENT_ID, $nonVolatileClient) &&
-            array_key_exists(self::TAG_POSITION, $nonVolatileClient) &&
-            array_key_exists(self::TAG_ROTATION, $nonVolatileClient) &&
-            array_key_exists(self::TAG_SKIN, $nonVolatileClient) &&
-            array_key_exists(self::TAG_CUSTOM_NAME, $nonVolatileClient);
-        if ($isValid) {
+        if (isset(
+            $nonVolatileClient[self::TAG_CLIENT_ID],
+            $nonVolatileClient[self::TAG_POSITION],
+            $nonVolatileClient[self::TAG_ROTATION],
+            $nonVolatileClient[self::TAG_SKIN],
+            $nonVolatileClient[self::TAG_CUSTOM_NAME]
+        )) {
             $position = null;
             $positionProperty = $nonVolatileClient[self::TAG_POSITION];
-            $positionIsValid = array_key_exists(self::TAG_X, $positionProperty) &&
-                array_key_exists(self::TAG_Y, $positionProperty) &&
-                array_key_exists(self::TAG_Z, $positionProperty);
+            $positionIsValid = isset(
+                $positionProperty[self::TAG_X],
+                $positionProperty[self::TAG_Y],
+                $positionProperty[self::TAG_Z]
+            );
             if ($positionIsValid) {
                 $position = new Vector3(
                     $positionProperty[self::TAG_X],
@@ -63,18 +98,19 @@ class ReplayClient
             }
             $rotation = null;
             $rotationProperty = $nonVolatileClient[self::TAG_ROTATION];
-            $rotationIsValid = array_key_exists(self::TAG_YAW, $rotationProperty) &&
-                array_key_exists(self::TAG_PITCH, $rotationProperty);
+            $rotationIsValid = isset($rotationProperty[self::TAG_YAW], $rotationProperty[self::TAG_PITCH]);
             if ($rotationIsValid) {
                 $rotation = new Rotation($rotationProperty[self::TAG_YAW], $rotationProperty[self::TAG_PITCH]);
             }
             $skin = null;
             $skinProperty = $nonVolatileClient[self::TAG_SKIN];
-            $skinIsValid = array_key_exists(self::TAG_SKIN_ID, $skinProperty) &&
-                array_key_exists(self::TAG_SKIN_REGULAR_DATA, $skinProperty) &&
-                array_key_exists(self::TAG_SKIN_CAPE_DATA, $skinProperty) &&
-                array_key_exists(self::TAG_SKIN_GEOMETRY_NAME, $skinProperty) &&
-                array_key_exists(self::TAG_SKIN_GEOMETRY_DATA, $skinProperty);
+            $skinIsValid = isset(
+                $skinProperty[self::TAG_SKIN_ID],
+                $skinProperty[self::TAG_SKIN_REGULAR_DATA],
+                $skinProperty[self::TAG_SKIN_CAPE_DATA],
+                $skinProperty[self::TAG_SKIN_GEOMETRY_NAME],
+                $skinProperty[self::TAG_SKIN_GEOMETRY_DATA]
+            );
             if ($skinIsValid) {
                 $skin = new Skin(
                     utf8_decode($skinProperty[self::TAG_SKIN_ID]),
@@ -114,40 +150,6 @@ class ReplayClient
         $position = $player->asVector3();
         $rotation = new Rotation($player->yaw, $player->pitch);
         return new self($clientId, $skin, $position, $rotation, $customName);
-    }
-
-    /** @var string This is the player's name */
-    private $clientId;
-    /** @var Skin */
-    private $skin;
-    /** @var Vector3 */
-    private $position;
-    /** @var Rotation */
-    private $rotation;
-    /** @var string A custom name for the actor at replay time */
-    private $customName;
-
-    /** @var bool */
-    private $recorded = false;
-
-    /**
-     * ReplayClient constructor.
-     * @param string $clientId
-     * @param Skin $skin
-     * @param Vector3 $position
-     * @param Rotation $rotation
-     * @param string $customName
-     *
-     * @internal
-     */
-    public function __construct(string $clientId, Skin $skin, Vector3 $position, Rotation $rotation,
-                                string $customName = '')
-    {
-        $this->clientId = $clientId;
-        $this->skin = $skin;
-        $this->position = $position;
-        $this->rotation = $rotation;
-        $this->customName = $customName;
     }
 
     /**

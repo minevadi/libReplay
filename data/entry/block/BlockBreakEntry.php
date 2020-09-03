@@ -20,6 +20,17 @@ class BlockBreakEntry extends BlockEntry
 {
 
     /**
+     * BlockBreakEntry constructor.
+     * @param string $clientId
+     * @param Vector3 $position
+     */
+    public function __construct(string $clientId, Vector3 $position)
+    {
+        $this->entryType = EntryTypes::BLOCK_BREAK;
+        parent::__construct($clientId, self::TYPE_BREAK, $position);
+    }
+
+    /**
      * @inheritDoc
      *
      * @internal
@@ -31,17 +42,6 @@ class BlockBreakEntry extends BlockEntry
             return null;
         }
         return new self($clientId, $position);
-    }
-
-    /**
-     * BlockBreakEntry constructor.
-     * @param string $clientId
-     * @param Vector3 $position
-     */
-    public function __construct(string $clientId, Vector3 $position)
-    {
-        $this->entryType = EntryTypes::BLOCK_BREAK;
-        parent::__construct($clientId, self::TYPE_BREAK, $position);
     }
 
 }

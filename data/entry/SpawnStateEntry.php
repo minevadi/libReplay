@@ -18,30 +18,10 @@ class SpawnStateEntry extends DataEntry
 
     private const TAG_SPAWNED = 'spawned';
     private const TAG_KEEP_INVENTORY = 'keepInventory';
-
-    /**
-     * @inheritDoc
-     *
-     * @internal
-     */
-    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
-    {
-        $isValid = array_key_exists(self::TAG_SPAWNED, $nonVolatileEntry) &&
-            array_key_exists(self::TAG_KEEP_INVENTORY, $nonVolatileEntry);
-        if ($isValid) {
-            return new self(
-                $clientId,
-                $nonVolatileEntry[self::TAG_SPAWNED],
-                $nonVolatileEntry[self::TAG_KEEP_INVENTORY]
-            );
-        }
-        return null;
-    }
-
     /** @var bool The state of the client. True means spawned. False means despawned. */
-    private $spawned;
+    private bool $spawned;
     /** @var bool Whether to keep the previous inventory state. */
-    private $keepInventory;
+    private bool $keepInventory;
 
     /**
      * SpawnStateEntry constructor.
@@ -55,6 +35,24 @@ class SpawnStateEntry extends DataEntry
         $this->keepInventory = $keepInventory;
         $this->entryType = EntryTypes::SPAWN_STATE;
         parent::__construct($clientId);
+    }
+
+    /**
+     * @inheritDoc
+     *
+     * @internal
+     */
+    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
+    {
+        $isValid = isset($nonVolatileEntry[self::TAG_SPAWNED], $nonVolatileEntry[self::TAG_KEEP_INVENTORY]);
+        if ($isValid) {
+            return new self(
+                $clientId,
+                $nonVolatileEntry[self::TAG_SPAWNED],
+                $nonVolatileEntry[self::TAG_KEEP_INVENTORY]
+            );
+        }
+        return null;
     }
 
     /**

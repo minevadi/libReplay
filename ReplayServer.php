@@ -37,10 +37,55 @@ class ReplayServer
     /** @var NGThreadPool */
     private static $threadPool;
     /** @var ReplayServer[] */
-    private static $serverList = [];
+    private static array $serverList = [];
 
     /** @var bool */
     private static $status = self::DISABLED;
+    /** @var ReplayClient[] */
+    private array $connectedClientList = [];
+    /** @var Level */
+    private Level $level;
+    /** @var DataEntry[] */
+    private array $currentTickDataEntryMemory = [];
+    /** @var ReplayListener */
+    private ReplayListener $replayListener;
+    /** @var CaptureTask */
+    private CaptureTask $captureTask;
+    /** @var bool */
+    private bool $recording = false;
+    /** @var ReplayCompressionTask */
+    private ReplayCompressionTask $compressionTask;
+
+    /**
+     * ReplayServer constructor.
+     * @param Player[] $playerList
+     * @param Level $level
+     */
+    public function __construct(array $playerList, Level $level)
+    {
+        if (!self::$status) {
+            throw new RuntimeException('The replay system has not been setup properly');
+        }
+        foreach ($playerList as $player) {
+            $this->addClientFromPlayer($player);
+        }
+        $this->level = $level;
+        self::$serverList[] = $this;
+    }
+
+    /**
+     * Add client from a Player object.
+     *
+     * @param Player $player
+     * @return void
+     */
+    public function addClientFromPlayer(Player $player): void
+    {
+        $client = ReplayClient::readFromPlayer($player);
+        if ($client instanceof ReplayClient) {
+            $this->connectedClientList[$client->getClientId()] = $client;
+        }
+    }
 
     /**
      * Setup the ReplayServer.
@@ -100,6 +145,16 @@ class ReplayServer
     }
 
     /**
+     * Check if the server is recording.
+     *
+     * @return bool
+     */
+    public function isRecording(): bool
+    {
+        return $this->recording;
+    }
+
+    /**
      * Get all the replay servers currently
      * instantiated & recording on a specific
      * level.
@@ -120,38 +175,15 @@ class ReplayServer
         return $recordingServerList;
     }
 
-    /** @var ReplayClient[] */
-    private $connectedClientList = [];
-    /** @var Level */
-    private $level;
-
-    /** @var DataEntry[] */
-    private $currentTickDataEntryMemory = [];
-    /** @var ReplayListener */
-    private $replayListener;
-    /** @var CaptureTask */
-    private $captureTask;
-    /** @var bool */
-    private $recording = false;
-
-    /** @var ReplayCompressionTask */
-    private $compressionTask;
-
     /**
-     * ReplayServer constructor.
-     * @param Player[] $playerList
-     * @param Level $level
+     * Get the Level for which the server is currently
+     * running on.
+     *
+     * @return Level
      */
-    public function __construct(array $playerList, Level $level)
+    public function getLevel(): Level
     {
-        if (!self::$status) {
-            throw new RuntimeException('The replay system has not been setup properly');
-        }
-        foreach ($playerList as $player) {
-            $this->addClientFromPlayer($player);
-        }
-        $this->level = $level;
-        self::$serverList[] = $this;
+        return $this->level;
     }
 
     /**
@@ -185,7 +217,7 @@ class ReplayServer
      */
     public function getConnectedClientByClientId(string $clientId): ?ReplayClient
     {
-        $isConnected = array_key_exists($clientId, $this->connectedClientList);
+        $isConnected = isset($this->connectedClientList[$clientId]);
         if ($isConnected) {
             return $this->connectedClientList[$clientId];
         }
@@ -200,36 +232,11 @@ class ReplayServer
      */
     public function removeClient(ReplayClient $connectedClient): void
     {
-        $isConnected = in_array($connectedClient, $this->connectedClientList);
+        $isConnected = in_array($connectedClient, $this->connectedClientList, true);
         if ($isConnected) {
             $clientId = $connectedClient->getClientId();
             unset($this->connectedClientList[$clientId]);
         }
-    }
-
-    /**
-     * Add client from a Player object.
-     *
-     * @param Player $player
-     * @return void
-     */
-    public function addClientFromPlayer(Player $player): void
-    {
-        $client = ReplayClient::readFromPlayer($player);
-        if ($client instanceof ReplayClient) {
-            $this->connectedClientList[$client->getClientId()] = $client;
-        }
-    }
-
-    /**
-     * Get the Level for which the server is currently
-     * running on.
-     *
-     * @return Level
-     */
-    public function getLevel(): Level
-    {
-        return $this->level;
     }
 
     /**
@@ -255,8 +262,8 @@ class ReplayServer
     public function capture(int $currentTick): void
     {
         /**
-        $this->dataEntryMemory[$currentTick] = $this->currentTickDataEntryMemory;
-        $this->currentTickDataEntryMemory = [];
+         * $this->dataEntryMemory[$currentTick] = $this->currentTickDataEntryMemory;
+         * $this->currentTickDataEntryMemory = [];
          */
         $threadSafeTickMemory = [];
         foreach ($this->currentTickDataEntryMemory as $stepStamp => $dataEntry) {
@@ -264,16 +271,6 @@ class ReplayServer
         }
         $this->currentTickDataEntryMemory = [];
         $this->compressionTask->addCurrentTickToMemory($currentTick, $threadSafeTickMemory);
-    }
-
-    /**
-     * Check if the server is recording.
-     *
-     * @return bool
-     */
-    public function isRecording(): bool
-    {
-        return $this->recording;
     }
 
     /**
@@ -313,10 +310,10 @@ class ReplayServer
 
         if ($saveRecording) {
             /**
-            $replay = new Replay($this->dataEntryMemory, $this->connectedClientList, $this->referenceLevelName);
-            $this->savedRecording[$recordingName] = $replay;
-            $this->currentTickDataEntryMemory = [];
-            $this->dataEntryMemory = [];
+             * $replay = new Replay($this->dataEntryMemory, $this->connectedClientList, $this->referenceLevelName);
+             * $this->savedRecording[$recordingName] = $replay;
+             * $this->currentTickDataEntryMemory = [];
+             * $this->dataEntryMemory = [];
              */
             foreach ($this->connectedClientList as $connectedClient) {
                 $this->compressionTask->addClientData($connectedClient->convertToNonVolatile());

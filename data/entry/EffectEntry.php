@@ -15,38 +15,14 @@ class EffectEntry extends DataEntry
     private const TAG_LEVEL = 3;
     private const TAG_DURATION = 4;
     private const TAG_ADD = 5;
-
-    /**
-     * @inheritDoc
-     *
-     * @internal
-     */
-    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
-    {
-        $isValid = array_key_exists(self::TAG_EFFECT_ID, $nonVolatileEntry) &&
-            array_key_exists(self::TAG_LEVEL, $nonVolatileEntry) &&
-            array_key_exists(self::TAG_DURATION, $nonVolatileEntry) &&
-            array_key_exists(self::TAG_ADD, $nonVolatileEntry);
-        if ($isValid) {
-            return new self(
-                $clientId,
-                $nonVolatileEntry[self::TAG_EFFECT_ID],
-                $nonVolatileEntry[self::TAG_LEVEL],
-                $nonVolatileEntry[self::TAG_DURATION],
-                $nonVolatileEntry[self::TAG_ADD]
-            );
-        }
-        return null;
-    }
-
     /** @var int */
-    private $effectId;
+    private int $effectId;
     /** @var int */
-    private $level;
+    private int $level;
     /** @var int */
-    private $duration;
+    private int $duration;
     /** @var bool */
-    private $add;
+    private bool $add;
 
     /**
      * EffectEntry constructor.
@@ -64,6 +40,31 @@ class EffectEntry extends DataEntry
         $this->add = $add;
         $this->entryType = EntryTypes::EFFECT;
         parent::__construct($clientId);
+    }
+
+    /**
+     * @inheritDoc
+     *
+     * @internal
+     */
+    public static function constructFromNonVolatile(string $clientId, array $nonVolatileEntry): ?DataEntry
+    {
+        $isValid = isset(
+            $nonVolatileEntry[self::TAG_EFFECT_ID],
+            $nonVolatileEntry[self::TAG_LEVEL],
+            $nonVolatileEntry[self::TAG_DURATION],
+            $nonVolatileEntry[self::TAG_ADD],
+        );
+        if ($isValid) {
+            return new self(
+                $clientId,
+                $nonVolatileEntry[self::TAG_EFFECT_ID],
+                $nonVolatileEntry[self::TAG_LEVEL],
+                $nonVolatileEntry[self::TAG_DURATION],
+                $nonVolatileEntry[self::TAG_ADD]
+            );
+        }
+        return null;
     }
 
     /**

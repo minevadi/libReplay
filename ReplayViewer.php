@@ -18,27 +18,16 @@ use pocketmine\utils\TextFormat;
 class ReplayViewer
 {
 
-    /**
-     * Setup the replay player.
-     *
-     * @return void
-     */
-    public static function setup(): void
-    {
-        Entity::registerEntity(HumanActor::class, true);
-    }
-
     /** @var Replay */
-    private $replay;
+    private Replay $replay;
     /** @var HumanActor[] */
-    private $actorList;
+    private array $actorList;
     /** @var Level */
-    private $level;
+    private Level $level;
     /** @var DataEntry[][] */
-    private $unassignedDataEntryMemory;
-
+    private array $unassignedDataEntryMemory;
     /** @var int */
-    private $playbackSpeed = 1;
+    private int $playbackSpeed = 1;
 
     /**
      * ReplayViewer constructor.
@@ -70,7 +59,7 @@ class ReplayViewer
             $this->actorList[$clientId] = new HumanActor($this->level, $nbt, $skin);
             $customName = $client->getCustomName();
             $this->actorList[$clientId]->setNameTag($customName);
-            $scoreTag = TextFormat::WHITE . TextFormat::BOLD . '10' .  TextFormat::RED . ' ❤';
+            $scoreTag = TextFormat::WHITE . TextFormat::BOLD . '10' . TextFormat::RED . ' ❤';
             $this->actorList[$clientId]->setScoreTag($scoreTag);
             /** @var DataEntry[][] $clientScript */
             $clientScript = [];
@@ -90,6 +79,16 @@ class ReplayViewer
     }
 
     /**
+     * Setup the replay player.
+     *
+     * @return void
+     */
+    public static function setup(): void
+    {
+        Entity::registerEntity(HumanActor::class, true);
+    }
+
+    /**
      * Play the replay currently set.
      *
      * @return void
@@ -103,6 +102,23 @@ class ReplayViewer
         foreach ($this->actorList as $actor) {
             $actor->spawnToAll();
         }
+    }
+
+    /**
+     * Check if the replay is currently
+     * being played by this viewer.
+     *
+     * @return bool
+     */
+    public function isReplayPlaying(): bool
+    {
+        foreach ($this->actorList as $actor) {
+            $flaggedForDespawn = $actor->isFlaggedForDespawn();
+            if (!$flaggedForDespawn) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -171,23 +187,6 @@ class ReplayViewer
             return;
         }
         $this->playbackSpeed++;
-    }
-
-    /**
-     * Check if the replay is currently
-     * being played by this viewer.
-     *
-     * @return bool
-     */
-    public function isReplayPlaying(): bool
-    {
-        foreach ($this->actorList as $actor) {
-            $flaggedForDespawn = $actor->isFlaggedForDespawn();
-            if (!$flaggedForDespawn) {
-                return true;
-            }
-        }
-        return false;
     }
 
 }

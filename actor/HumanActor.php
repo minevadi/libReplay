@@ -62,19 +62,19 @@ class HumanActor extends Human implements ChunkLoader
     /** @var float */
     protected $drag = 0.0;
     /** @var ReplayViewer */
-    private $replayViewer;
+    private ReplayViewer $replayViewer;
     /** @var DataEntry[][] */
-    private $script;
+    private array $script;
     /** @var int */
-    private $step;
+    private int $step;
     /** @var Level This is a hack to go around PM's bad level|null checks. */
-    private $replayLevel;
+    private Level $replayLevel;
     /** @var Item[][] */
-    private $emulatedInventoryList = [];
+    private array $emulatedInventoryList = [];
     /** @var PublicQueue */
-    private $packetQueue;
-    /** @var int THIS 0 IS IMPORTANT*/
-    private $loaderId = 0;
+    private PublicQueue $packetQueue;
+    /** @var int THIS 0 IS IMPORTANT */
+    private int $loaderId = 0;
 
     public function __construct(Level $level, CompoundTag $nbt, Skin $skin)
     {
@@ -187,53 +187,6 @@ class HumanActor extends Human implements ChunkLoader
     }
 
     /**
-     * Handle the spawn-state entry.
-     *
-     * @param DataEntry $entry
-     * @return void
-     */
-    public function handleSpawnStateEntry(DataEntry $entry): void
-    {
-        if (!$entry instanceof SpawnStateEntry) {
-            throw new DataEntryException([$entry], 'An unrecoverable exception occurred. Wrong entry provided.');
-        }
-        $spawned = $entry->isSpawned();
-        if (!$spawned) {
-            $keepInventory = $entry->isKeepInventory();
-            if ($keepInventory) {
-                $this->emulatedInventoryList[self::BASE_INVENTORY] = $this->inventory->getContents();
-                $this->emulatedInventoryList[self::ARMOR_INVENTORY] = $this->armorInventory->getContents();
-            } else {
-                $exist = isset($this->emulatedInventoryList[self::BASE_INVENTORY]);
-                if ($exist) {
-                    unset($this->emulatedInventoryList[self::BASE_INVENTORY]);
-                }
-                $exist = isset($this->emulatedInventoryList[self::ARMOR_INVENTORY]);
-                if ($exist) {
-                    unset($this->emulatedInventoryList[self::BASE_INVENTORY]);
-                }
-            }
-            $this->inventory->setContents([]);
-            $this->armorInventory->setContents([]);
-            $this->setInvisible(true);
-        } else {
-            $exist = isset($this->emulatedInventoryList[self::BASE_INVENTORY]);
-            if ($exist) {
-                $this->inventory->setContents($this->emulatedInventoryList[self::BASE_INVENTORY]);
-                unset($this->emulatedInventoryList[self::BASE_INVENTORY]);
-            }
-            $exist = isset($this->emulatedInventoryList[self::ARMOR_INVENTORY]);
-            if ($exist) {
-                $this->armorInventory->setContents($this->emulatedInventoryList[self::ARMOR_INVENTORY]);
-                unset($this->emulatedInventoryList[self::BASE_INVENTORY]);
-            }
-            $this->setInvisible(false);
-        }
-        $key = array_search($entry, $this->script[$this->step], true);
-        unset($this->script[$this->step][$key]);
-    }
-
-    /**
      * Handle the transform entry.
      *
      * @param DataEntry $entry
@@ -322,6 +275,22 @@ class HumanActor extends Human implements ChunkLoader
 
         $key = array_search($entry, $this->script[$this->step], true);
         unset($this->script[$this->step][$key]);
+    }
+
+    /**
+     * Gets called when an entity is being attacked.
+     *
+     * @param EntityDamageEvent $source
+     * @param bool $replaySide
+     * @return void
+     */
+    public function attack(EntityDamageEvent $source, bool $replaySide = false): void
+    {
+        if (!$replaySide) {
+            $source->setCancelled();
+        }
+
+        parent::attack($source);
     }
 
     /**
@@ -482,6 +451,53 @@ class HumanActor extends Human implements ChunkLoader
     }
 
     /**
+     * Handle the spawn-state entry.
+     *
+     * @param DataEntry $entry
+     * @return void
+     */
+    public function handleSpawnStateEntry(DataEntry $entry): void
+    {
+        if (!$entry instanceof SpawnStateEntry) {
+            throw new DataEntryException([$entry], 'An unrecoverable exception occurred. Wrong entry provided.');
+        }
+        $spawned = $entry->isSpawned();
+        if (!$spawned) {
+            $keepInventory = $entry->isKeepInventory();
+            if ($keepInventory) {
+                $this->emulatedInventoryList[self::BASE_INVENTORY] = $this->inventory->getContents();
+                $this->emulatedInventoryList[self::ARMOR_INVENTORY] = $this->armorInventory->getContents();
+            } else {
+                $exist = isset($this->emulatedInventoryList[self::BASE_INVENTORY]);
+                if ($exist) {
+                    unset($this->emulatedInventoryList[self::BASE_INVENTORY]);
+                }
+                $exist = isset($this->emulatedInventoryList[self::ARMOR_INVENTORY]);
+                if ($exist) {
+                    unset($this->emulatedInventoryList[self::BASE_INVENTORY]);
+                }
+            }
+            $this->inventory->setContents([]);
+            $this->armorInventory->setContents([]);
+            $this->setInvisible(true);
+        } else {
+            $exist = isset($this->emulatedInventoryList[self::BASE_INVENTORY]);
+            if ($exist) {
+                $this->inventory->setContents($this->emulatedInventoryList[self::BASE_INVENTORY]);
+                unset($this->emulatedInventoryList[self::BASE_INVENTORY]);
+            }
+            $exist = isset($this->emulatedInventoryList[self::ARMOR_INVENTORY]);
+            if ($exist) {
+                $this->armorInventory->setContents($this->emulatedInventoryList[self::ARMOR_INVENTORY]);
+                unset($this->emulatedInventoryList[self::BASE_INVENTORY]);
+            }
+            $this->setInvisible(false);
+        }
+        $key = array_search($entry, $this->script[$this->step], true);
+        unset($this->script[$this->step][$key]);
+    }
+
+    /**
      * Handle the effect entry.
      *
      * @param DataEntry $entry
@@ -515,26 +531,10 @@ class HumanActor extends Human implements ChunkLoader
         if ($count === 0) {
             $this->step++;
         }
-        $stepExistence = array_key_exists($this->step, $this->script);
+        $stepExistence = $this->script[$this->step];
         if (!$stepExistence) {
             $this->flagForDespawn();
         }
-    }
-
-    /**
-     * Gets called when an entity is being attacked.
-     *
-     * @param EntityDamageEvent $source
-     * @param bool $replaySide
-     * @return void
-     */
-    public function attack(EntityDamageEvent $source, bool $replaySide = false): void
-    {
-        if (!$replaySide) {
-            $source->setCancelled();
-        }
-
-        parent::attack($source);
     }
 
     /**
@@ -546,7 +546,9 @@ class HumanActor extends Human implements ChunkLoader
      * @param EntityDamageEvent $source
      * @return void
      */
-    public function applyDamageModifiers(EntityDamageEvent $source): void {}
+    public function applyDamageModifiers(EntityDamageEvent $source): void
+    {
+    }
 
     /**
      * @inheritDoc
@@ -567,26 +569,36 @@ class HumanActor extends Human implements ChunkLoader
     /**
      * @inheritDoc
      */
-    public function onChunkChanged(Chunk $chunk): void {}
+    public function onChunkChanged(Chunk $chunk): void
+    {
+    }
 
     /**
      * @inheritDoc
      */
-    public function onChunkLoaded(Chunk $chunk): void {}
+    public function onChunkLoaded(Chunk $chunk): void
+    {
+    }
 
     /**
      * @inheritDoc
      */
-    public function onChunkUnloaded(Chunk $chunk): void {}
+    public function onChunkUnloaded(Chunk $chunk): void
+    {
+    }
 
     /**
      * @inheritDoc
      */
-    public function onChunkPopulated(Chunk $chunk): void {}
+    public function onChunkPopulated(Chunk $chunk): void
+    {
+    }
 
     /**
      * @inheritDoc
      */
-    public function onBlockChanged(Vector3 $block): void {}
+    public function onBlockChanged(Vector3 $block): void
+    {
+    }
 
 }
