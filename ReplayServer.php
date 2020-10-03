@@ -14,6 +14,7 @@ use pocketmine\event\HandlerListManager;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\plugin\PluginManager;
+use pocketmine\scheduler\TaskHandler;
 use pocketmine\world\World;
 use RuntimeException;
 
@@ -305,8 +306,9 @@ class ReplayServer
             unset($this->replayListener);
         }
         if ($this->captureTask instanceof CaptureTask) {
-            $taskId = $this->captureTask->getTaskId();
-            self::$plugin->getScheduler()->cancelTask($taskId);
+            /** @var TaskHandler $handler */
+            $handler = $this->captureTask->getHandler();
+            $handler->cancel();
             unset($this->captureTask);
         }
 

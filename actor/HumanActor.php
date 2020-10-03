@@ -500,7 +500,7 @@ class HumanActor extends Human implements ChunkLoader
     public function attack(EntityDamageEvent $source, bool $replaySide = false): void
     {
         if (!$replaySide) {
-            $source->setCancelled();
+            $source->cancel();
         }
 
         parent::attack($source);
