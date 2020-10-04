@@ -17,7 +17,7 @@ class CaptureTask extends Task
 {
 
     /** @var ReplayServer */
-    private $replayServer;
+    private ReplayServer $replayServer;
 
     /**
      * CaptureTask constructor.

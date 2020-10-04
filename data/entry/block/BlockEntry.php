@@ -45,9 +45,9 @@ abstract class BlockEntry extends DataEntry
     }
 
     /** @var int */
-    private $actionType;
+    private int $actionType;
     /** @var Vector3 */
-    private $position;
+    private Vector3 $position;
 
     /**
      * BlockEntry constructor.

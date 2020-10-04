@@ -16,9 +16,9 @@ class ReplayComposedEvent extends PluginEvent
 {
 
     /** @var ReplayCompressed */
-    private $replay;
+    private ReplayCompressed $replay;
     /** @var array */
-    private $extraData;
+    private array $extraData;
 
     /**
      * ReplayComposedEvent constructor.

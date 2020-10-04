@@ -51,7 +51,7 @@ class ReplayListener implements Listener
 {
 
     /** @var ReplayServer */
-    private $replayServer;
+    private ReplayServer $replayServer;
 
     /**
      * ReplayListener constructor.
@@ -133,7 +133,6 @@ class ReplayListener implements Listener
      * @return void
      *
      * @priority            MONITOR
-     * @ignoreCancelled     true
      */
     public function handleTransformEntry(PlayerMoveEvent $event): void
     {
@@ -163,7 +162,6 @@ class ReplayListener implements Listener
      * @return void
      *
      * @priority            MONITOR
-     * @ignoreCancelled     true
      */
     public function handleTransformEntryOnEnderPearl(ProjectileHitEvent $event): void
     {
@@ -198,7 +196,6 @@ class ReplayListener implements Listener
      * @return void
      *
      * @priority            MONITOR
-     * @ignoreCancelled     true
      */
     public function handleDamageAnimationEntry(EntityDamageByEntityEvent $event): void
     {
@@ -222,7 +219,6 @@ class ReplayListener implements Listener
      * @return void
      *
      * @priority            MONITOR
-     * @ignoreCancelled     true
      */
     public function handleEatAnimationEntry(PlayerItemConsumeEvent $event): void
     {
@@ -247,7 +243,6 @@ class ReplayListener implements Listener
      * @return void
      *
      * @priority            MONITOR
-     * @ignoreCancelled     true
      */
     public function handleTakeDamageEntry(EntityDamageEvent $event): void
     {
@@ -274,7 +269,6 @@ class ReplayListener implements Listener
      * @return void
      *
      * @priority            MONITOR
-     * @ignoreCancelled     true
      */
     public function handleRegainHealthEntry(EntityRegainHealthEvent $event): void
     {
@@ -301,7 +295,6 @@ class ReplayListener implements Listener
      * @return void
      *
      * @priority            MONITOR
-     * @ignoreCancelled     true
      */
     public function handleBlockPlaceEntry(BlockPlaceEvent $event): void
     {
@@ -329,7 +322,6 @@ class ReplayListener implements Listener
      * @return void
      *
      * @priority            MONITOR
-     * @ignoreCancelled     true
      */
     public function handleBlockBreakEntry(BlockBreakEvent $event): void
     {
@@ -355,7 +347,6 @@ class ReplayListener implements Listener
      * @return void
      *
      * @priority            MONITOR
-     * @ignoreCancelled     true
      */
     public function handleInventoryEditEntry(InventoryTransactionEvent $event): void
     {
@@ -392,7 +383,6 @@ class ReplayListener implements Listener
      * @return void
      *
      * @priority            MONITOR
-     * @ignoreCancelled     true
      */
     public function handleChestInteractionEntryOnOpen(InventoryOpenEvent $event): void
     {
@@ -420,7 +410,6 @@ class ReplayListener implements Listener
      * @return void
      *
      * @priority            MONITOR
-     * @ignoreCancelled     true
      */
     public function handleChestInteractionEntryOnClose(InventoryCloseEvent $event): void
     {
@@ -448,7 +437,6 @@ class ReplayListener implements Listener
      * @return void
      *
      * @priority            MONITOR
-     * @ignoreCancelled     true
      */
     public function handleEffectEntryOnAdd(EntityEffectAddEvent $event): void
     {

@@ -37,9 +37,9 @@ class TakeDamageEntry extends DataEntry
     }
 
     /** @var float */
-    private $damageTaken;
+    private float $damageTaken;
     /** @var int */
-    private $cause;
+    private int $cause;
 
     /**
      * TakeDamageEntry constructor.

@@ -118,18 +118,18 @@ class ReplayClient
     }
 
     /** @var string This is the player's name */
-    private $clientId;
+    private string $clientId;
     /** @var Skin */
-    private $skin;
+    private Skin $skin;
     /** @var Vector3 */
-    private $position;
+    private Vector3 $position;
     /** @var Rotation */
-    private $rotation;
+    private Rotation $rotation;
     /** @var string A custom name for the actor at replay time */
-    private $customName;
+    private string $customName;
 
     /** @var bool */
-    private $recorded = false;
+    private bool $recorded = false;
 
     /**
      * ReplayClient constructor.

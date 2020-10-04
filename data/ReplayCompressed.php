@@ -17,9 +17,9 @@ class ReplayCompressed
 {
 
     /** @var string */
-    private $memory;
+    private string $memory;
     /** @var float */
-    private $version;
+    private float $version;
 
     /**
      * ReplayCompressed constructor.

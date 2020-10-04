@@ -39,9 +39,9 @@ class SpawnStateEntry extends DataEntry
     }
 
     /** @var bool The state of the client. True means spawned. False means despawned. */
-    private $spawned;
+    private bool $spawned;
     /** @var bool Whether to keep the previous inventory state. */
-    private $keepInventory;
+    private bool $keepInventory;
 
     /**
      * SpawnStateEntry constructor.

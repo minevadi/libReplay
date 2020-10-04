@@ -24,16 +24,16 @@ use pocketmine\world\World;
 class ReplayViewer
 {
     /** @var Replay */
-    private $replay;
+    private Replay $replay;
     /** @var HumanActor[] */
-    private $actorList;
+    private array $actorList;
     /** @var World */
-    private $world;
+    private World $world;
     /** @var DataEntry[][] */
-    private $unassignedDataEntryMemory;
+    private array $unassignedDataEntryMemory;
 
     /** @var int */
-    private $playbackSpeed = 1;
+    private int $playbackSpeed = 1;
 
     /**
      * ReplayViewer constructor.

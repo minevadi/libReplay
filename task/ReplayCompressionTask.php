@@ -27,13 +27,13 @@ class ReplayCompressionTask extends AsyncTask
     private const COMPRESSION_LEVEL = ZSTD_COMPRESS_LEVEL_MAX;
 
     /** @var array */
-    private $memory = [
+    private array $memory = [
         self::MEMORY_TYPE_REPLAY => [],
         self::MEMORY_TYPE_CLIENT => []
     ];
 
     /** @var string */
-    private $compressedMemory;
+    private string $compressedMemory;
 
     /**
      * Wrapper over {@link AsyncTask::storeLocal()}.

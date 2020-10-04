@@ -56,15 +56,15 @@ class HumanActor extends Human implements ChunkLoader
     /** @var float */
     protected $drag = 0.0;
     /** @var ReplayViewer */
-    private $replayViewer;
+    private ReplayViewer $replayViewer;
     /** @var DataEntry[][] */
-    private $script;
+    private array $script;
     /** @var int */
-    private $step;
+    private int $step;
     /** @var Item[][] */
-    private $emulatedInventoryList = [];
+    private array $emulatedInventoryList = [];
     /** @var PacketManager */
-    private $packetQueue;
+    private PacketManager $packetQueue;
 
     /**
      * Configure the actor.

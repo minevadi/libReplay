@@ -18,11 +18,11 @@ class Replay
 {
 
     /** @var DataEntry[][] */
-    private $dataEntryMemory;
+    private array $dataEntryMemory;
     /** @var ReplayClient[] */
-    private $recordedClientList;
+    private array $recordedClientList;
     /** @var float */
-    private $version;
+    private float $version;
 
     /**
      * Replay constructor.

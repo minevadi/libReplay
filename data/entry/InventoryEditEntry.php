@@ -69,9 +69,9 @@ class InventoryEditEntry extends DataEntry
     /** @var int */
     private $inventoryId;
     /** @var int */
-    private $slot;
+    private int $slot;
     /** @var Item */
-    private $item;
+    private Item $item;
 
     /**
      * InventoryEditEntry constructor.

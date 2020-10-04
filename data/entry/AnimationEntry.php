@@ -35,9 +35,9 @@ class AnimationEntry extends DataEntry
     }
 
     /** @var int */
-    private $animation;
+    private int $animation;
     /** @var int Duration in ms */
-    private $duration;
+    private int $duration;
 
     /**
      * AnimationEntry constructor.

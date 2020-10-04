@@ -95,15 +95,15 @@ class TransformEntry extends DataEntry
     }
 
     /** @var Vector3 */
-    private $position;
+    private Vector3 $position;
     /** @var Rotation */
-    private $rotation;
+    private Rotation $rotation;
     /** @var int */
-    private $state;
+    private int $state;
     /** @var float */
-    private $speed;
+    private float $speed;
     /** @var bool */
-    private $teleport;
+    private bool $teleport;
 
     /**
      * TransformEntry constructor.

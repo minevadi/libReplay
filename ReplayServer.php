@@ -39,7 +39,7 @@ class ReplayServer
     /** @var NGThreadPool */
     private static $threadPool;
     /** @var ReplayServer[] */
-    private static $serverList = [];
+    private static array $serverList = [];
 
     /** @var bool */
     private static $status = self::DISABLED;
@@ -122,21 +122,21 @@ class ReplayServer
     }
 
     /** @var ReplayClient[] */
-    private $connectedClientList = [];
+    private array $connectedClientList = [];
     /** @var World */
-    private $world;
+    private World $world;
 
     /** @var DataEntry[] */
-    private $currentTickDataEntryMemory = [];
+    private array $currentTickDataEntryMemory = [];
     /** @var ReplayListener */
-    private $replayListener;
+    private ReplayListener $replayListener;
     /** @var CaptureTask */
-    private $captureTask;
+    private CaptureTask $captureTask;
     /** @var bool */
-    private $recording = false;
+    private bool $recording = false;
 
     /** @var ReplayCompressionTask */
-    private $compressionTask;
+    private ReplayCompressionTask $compressionTask;
 
     /**
      * ReplayServer constructor.

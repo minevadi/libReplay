@@ -70,7 +70,7 @@ abstract class DataEntry
     /** @var int */
     protected $entryType = EntryTypes::DEFAULT;
     /** @var string */
-    protected $clientId;
+    protected string $clientId;
 
     /**
      * DataEntry constructor.

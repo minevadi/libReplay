@@ -40,13 +40,13 @@ class EffectEntry extends DataEntry
     }
 
     /** @var int */
-    private $effectId;
+    private int $effectId;
     /** @var int */
-    private $level;
+    private int $level;
     /** @var int */
-    private $duration;
+    private int $duration;
     /** @var bool */
-    private $add;
+    private bool $add;
 
     /**
      * EffectEntry constructor.

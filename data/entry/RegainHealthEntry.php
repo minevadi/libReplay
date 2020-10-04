@@ -37,9 +37,9 @@ class RegainHealthEntry extends DataEntry
     }
 
     /** @var float */
-    private $healthRegained;
+    private float $healthRegained;
     /** @var int */
-    private $regainReason;
+    private int $regainReason;
 
     /**
      * RegainHealthEntry constructor.
