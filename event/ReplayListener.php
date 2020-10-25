@@ -20,6 +20,7 @@ use libReplay\ReplayServer;
 use NetherGames\NGEssentials\player\NGPlayer;
 use pocketmine\block\inventory\ChestInventory;
 use pocketmine\block\tile\Chest;
+use pocketmine\data\bedrock\EffectIdMap;
 use pocketmine\entity\FoodSource;
 use pocketmine\entity\projectile\EnderPearl;
 use pocketmine\event\block\BlockBreakEvent;
@@ -452,7 +453,7 @@ class ReplayListener implements Listener
             }
             $clientId = $client->getClientId();
             $effect = $event->getEffect();
-            $effectId = $effect->getType()->getRuntimeId();
+            $effectId = EffectIdMap::getInstance()->toId($effect->getType());
             $world = $effect->getEffectLevel();
             $duration = $effect->getDuration();
             $entry = new EffectEntry($clientId, $effectId, $world, $duration, true);
