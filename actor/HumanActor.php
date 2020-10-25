@@ -21,6 +21,8 @@ use libReplay\ReplayViewer;
 use NetherGames\NGEssentials\utils\packets\PacketManager;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\VanillaBlocks;
+use pocketmine\data\bedrock\EffectIdMap;
+use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\entity\effect\Effect;
 use pocketmine\entity\effect\EffectInstance;
 use pocketmine\entity\effect\VanillaEffects;
@@ -466,7 +468,7 @@ class HumanActor extends Human implements ChunkLoader
         $effectDuration = $entry->getDuration();
 
         /** @var Effect $effect */
-        $effect = VanillaEffects::byMcpeId($effectId);
+        $effect = EffectIdMap::getInstance()->fromId($effectId);
         $this->getEffects()->add(new EffectInstance($effect, $effectDuration, $effectLevel));
         $key = array_search($entry, $this->script[$this->step], true);
         unset($this->script[$this->step][$key]);

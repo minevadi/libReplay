@@ -452,7 +452,7 @@ class ReplayListener implements Listener
             }
             $clientId = $client->getClientId();
             $effect = $event->getEffect();
-            $effectId = $effect->getId();
+            $effectId = $effect->getType()->getRuntimeId();
             $world = $effect->getEffectLevel();
             $duration = $effect->getDuration();
             $entry = new EffectEntry($clientId, $effectId, $world, $duration, true);
