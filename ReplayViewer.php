@@ -13,7 +13,7 @@ use pocketmine\entity\EntityFactory;
 use pocketmine\entity\Location;
 use pocketmine\entity\projectile\Egg;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\network\mcpe\protocol\types\entity\EntityLegacyIds;
+use pocketmine\data\bedrock\EntityLegacyIds;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\World;
 
