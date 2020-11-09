@@ -27,6 +27,6 @@ jobs:
           path: PharBuilder
           ref: PMMP4.0
       - name: Run PHPStan
-        uses: nxtlvlsoftware/pmmp-phpstan-action@3
+        uses: larryTheCoder/pmmp-phpstan-action@master
         with:
           phpstan-config: src/phpstan.neon.dist
